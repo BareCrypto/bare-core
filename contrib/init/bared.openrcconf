@@ -1,0 +1,26 @@
+# /etc/conf.d/bared: config file for /etc/init.d/bared
+
+# Config file location
+#BITCOIND_CONFIGFILE="/etc/bare/bare.conf"
+
+# What directory to write pidfile to?  (created and owned by $BITCOIND_USER)
+#BITCOIND_PIDDIR="/var/run/bared"
+
+# What filename to give the pidfile
+#BITCOIND_PIDFILE="${BITCOIND_PIDDIR}/bared.pid"
+
+# Where to write bared data (be mindful that the blockchain is large)
+#BITCOIND_DATADIR="/var/lib/bared"
+
+# User and group to own bared process
+#BITCOIND_USER="bare"
+#BITCOIND_GROUP="bare"
+
+# Path to bared executable
+#BITCOIND_BIN="/usr/bin/bared"
+
+# Nice value to run bared under
+#BITCOIND_NICE=0
+
+# Additional options (avoid -conf and -datadir, use flags above)
+BITCOIND_OPTS=""

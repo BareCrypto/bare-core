@@ -1,0 +1,2 @@
+# BareCore
+Update coming soon!

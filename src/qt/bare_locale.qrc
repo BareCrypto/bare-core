@@ -1,0 +1,20 @@
+<!DOCTYPE RCC><RCC version="1.0">
+    <qresource prefix="/translations">
+        <file alias="bg">locale/bare_bg.qm</file>
+        <file alias="de">locale/bare_de.qm</file>
+        <file alias="en">locale/bare_en.qm</file>
+        <file alias="es">locale/bare_es.qm</file>
+        <file alias="fi">locale/bare_fi.qm</file>
+        <file alias="fr">locale/bare_fr.qm</file>
+        <file alias="it">locale/bare_it.qm</file>
+        <file alias="ja">locale/bare_ja.qm</file>
+        <file alias="pl">locale/bare_pl.qm</file>
+        <file alias="pt">locale/bare_pt.qm</file>
+        <file alias="ru">locale/bare_ru.qm</file>
+        <file alias="sk">locale/bare_sk.qm</file>
+        <file alias="sv">locale/bare_sv.qm</file>
+        <file alias="vi">locale/bare_vi.qm</file>
+        <file alias="zh_CN">locale/bare_zh_CN.qm</file>
+        <file alias="zh_TW">locale/bare_zh_TW.qm</file>
+    </qresource>
+</RCC>
