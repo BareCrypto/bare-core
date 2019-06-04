@@ -15,7 +15,11 @@ Masternode Reward: 85%
 Masternode Collateral: 1000 BARE
 
 Webpage: https://bare.network
+
 Explorer: http://explorer.bare.network
+
 Discord: https://discord.gg/hr6hMH
+
 Twitter: https://twitter.com/bare_crypto
+
 BitcoinTalk: https://bitcointalk.org/index.php?topic=5149503
