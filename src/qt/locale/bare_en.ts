@@ -2199,7 +2199,7 @@ Please check the address and try again.</source>
     <message>
         <location line="+21"/>
         <source>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/nocoinerdev2/bare-project-translations</source>
+https://www.transifex.com/barecoin/bare-project-translations</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5495,7 +5495,7 @@ for example: alertnotify=echo %%s | mail -s &quot;Bare Alert&quot; admin@foo.com
     </message>
     <message>
         <location line="+1"/>
-        <source>Copyright (C) 2019-%i The Bare Core Developers</source>
+        <source>Copyright (C) 2017-%i The Bare Core Developers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

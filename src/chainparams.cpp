@@ -3,7 +3,7 @@
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The PIVX developers
 // Copyright (c) 2015-2017 The ALQO developers
-// Copyright (c) 2017-2018 The Bare developers
+// Copyright (c) 2017-2019 The Bare developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -98,7 +98,7 @@ public:
         nRejectBlockOutdatedMajority = 950;
         nToCheckBlockUpgradeMajority = 1000;
         nMinerThreads = 0;
-        nTargetTimespan = 1 * 60; // Bare: 5 minutes
+        nTargetTimespan = 1 * 60; // Bare: 1 minutes
         nTargetSpacing = 1 * 60;  // Bare: 1 minute
         nLastPOWBlock = 500;
         nMaturity = 24;
@@ -137,8 +137,8 @@ public:
         vSeeds.push_back(CDNSSeedData("37.44.215.150", "37.44.215.150"));
 		vSeeds.push_back(CDNSSeedData("37.44.215.145", "37.44.215.145"));
 		vSeeds.push_back(CDNSSeedData("37.44.215.108", "37.44.215.108"));
-
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 25);
+																	 
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 25); //Bare adresses start with "B"
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 16);
         base58Prefixes[SECRET_KEY] = std::vector<unsigned char>(1, 110);
         base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x04)(0x88)(0xB2)(0x1E).convert_to_container<std::vector<unsigned char> >();

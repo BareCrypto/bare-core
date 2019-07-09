@@ -27,7 +27,7 @@ Webpage: https://bare.network
 
 Explorer: http://explorer.bare.network
 
-Discord: https://discord.gg/hr6hMH
+Discord: https://discord.gg/HqHutDk
 
 Twitter: https://twitter.com/bare_crypto
 

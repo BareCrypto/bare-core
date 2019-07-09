@@ -247,7 +247,7 @@ then
 fi
 
 # Set up build
-pushd ./bare-core/
+pushd ./bare-core
 git fetch
 git checkout ${COMMIT}
 popd

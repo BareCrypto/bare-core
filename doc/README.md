@@ -4,7 +4,7 @@ Bare Core
 Setup
 -----
 
-[Bare Core]http://bit.bares/ is the original Bare client and it builds the backbone of the network. However, it downloads and stores the entire history of Bare transactions; depending on the speed of your computer and network connection, the synchronization process can take anywhere from a few hours to a day or more. Thankfully you only have to do this once.
+[Bare Core]https://bare.network/ is the original Bare client and it builds the backbone of the network. However, it downloads and stores the entire history of Bare transactions; depending on the speed of your computer and network connection, the synchronization process can take anywhere from a few hours to a day or more. Thankfully you only have to do this once.
 
 Running
 -------
@@ -29,8 +29,8 @@ Drag Bare-Qt to your applications folder, and then run Bare-Qt.
 
 * See the documentation at the [Bare Wiki](https://en.bitcoin.it/wiki/Main_Page) ***TODO***
 for help and more information.
-* Ask for help on [BitcoinTalk](https://bitcointalk.org/index.php?topic=2976421).
-* Join our Discord server [Bare Discord](https://discord.gg/DHYsG6j).
+* Ask for help on [BitcoinTalk](https://bitcointalk.org/index.php?topic=5149503).
+* Join our Discord server [Bare Discord](https://discord.gg/HqHutDk).
 
 Building
 --------
@@ -58,8 +58,8 @@ The Bare repo's [root README](https://github.com/BareCrypto/bare-core/bare-core/
 
 ### Resources
 
-* Discuss on the [BitcoinTalk](https://bitcointalk.org/index.php?topic=2976421).
-* Join the [Bare Discord](https://discord.gg/DHYsG6j) 
+* Discuss on the [BitcoinTalk](https://bitcointalk.org/index.php?topic=5149503).
+* Join the [Bare Discord](https://discord.gg/HqHutDk) 
 
 ### Miscellaneous
 
