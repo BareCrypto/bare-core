@@ -19,7 +19,7 @@ For example:
   ./github-merge.py 3077
 
 (in any git repository) will help you merge pull request #3077 for the
-nocoinerdev2/bare-core repository.
+barecoin/bare-core repository.
 
 What it does:
 * Fetch master and the pull request.
@@ -39,7 +39,7 @@ Setup
 
 Configuring the github-merge tool for the Bare repository is done in the following way:
 
-    git config githubmerge.repository nocoinerdev2/bare-core
+    git config githubmerge.repository barecoin/bare-core
     git config githubmerge.testcmd "make -j4 check" (adapt to whatever you want to use for testing)
     git config --global user.signingkey mykeyid (if you want to GPG sign)
 

@@ -1259,9 +1259,9 @@ Endereço: %4
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/nocoinerdev2/bare-wallet-translations/</source>
+https://www.transifex.com/barecoin/bare-wallet-translations/</source>
         <translation>Linguagem não encontrada ou tradução incompleta? Ajude a traduzir aqui:
-https://www.transifex.com/nocoinerdev2/bare-wallet-translations/</translation>
+https://www.transifex.com/barecoin/bare-wallet-translations/</translation>
     </message>
     <message>
         <source>User Interface Theme:</source>

@@ -1263,9 +1263,9 @@ Address: %4
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/nocoinerdev2/bare-wallet-translations/</source>
+https://www.transifex.com/barecoin/bare-wallet-translations/</source>
         <translation>Липсва език или превода е непълен? Можете да помогнете с превода тук:
-https://www.transifex.com/nocoinerdev2/bare-wallet-translations/</translation>
+https://www.transifex.com/barecoin/bare-wallet-translations/</translation>
     </message>
     <message>
         <source>User Interface Theme:</source>
@@ -3721,7 +3721,7 @@ If the file does not exist, create it with owner-readable-only file permissions.
 It is also recommended to set alertnotify so you are notified of problems;
 for example: alertnotify=echo %%s | mail -s "Bare Alert" admin@foo.com
 </source>
-        <translation>За използване на bared, или the -server опция към bare-qt, трябва да зададете rpcpassword в конфигурационния файл: %s Препоръчително е да използвате следната произволна парола: rpcuser=barerpc rpcpassword=%s (не е нужно да запомняте тази парола) Потребителя и паролата НЕ ТРЯБВА да са еднакви. Ако файла не съществува , създайте го с права за само за четене. Препоръчително е да създадете сигнал за уведомяване за да бъдете осведомени при проблем; Пример: alertnotify=echo %%s | mail -s "Bare Alert" admin@foo.com
+        <translation>За използване на bared, или the -server опция към bare-qt, трябва да зададете rpcpassword в конфигурационния файл: %s Препоръчително е да използвате следната произволна парола: rpcuser=barerpc rpcpassword=%s (не е нужно да запомняте тази парола) Потребителя и паролата НЕ ТРЯБВА да са еднакви. Ако файла не съществува , създайте го с права за само за четене. Препоръчително е да създадете сигнал за уведомяване за да бъдете осведомени при проблем; Пример: alertnotify=echo %%s | mail -s "Bare Alert" admin@foo.com 
 </translation>
     </message>
     <message>

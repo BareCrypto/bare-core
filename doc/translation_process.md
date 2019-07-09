@@ -9,7 +9,7 @@ Transifex is setup to monitor the GitHub repo for updates, and when code contain
 
 Multiple language support is critical in assisting Bare's global adoption, and growth. One of Bare's greatest strengths is cross-border money transfers, any help making that easier is greatly appreciated.
 
-See the [Transifex Bare project](https://www.transifex.com/nocoinerdev2/bare-project-translations/) to assist in translations.
+See the [Transifex Bare project](https://www.transifex.com/barecoin/bare-project-translations/) to assist in translations.
 
 ### Writing code with translations
 
@@ -50,7 +50,7 @@ git commit
 
 Visit the [Transifex Signup](https://www.transifex.com/signup/) page to create an account. Take note of your username and password, as they will be required to configure the command-line tool.
 
-You can find the Bare translation project at [https://www.transifex.com/nocoinerdev2/bare-project-translations/](https://www.transifex.com/nocoinerdev2/bare-project-translations/).
+You can find the Bare translation project at [https://www.transifex.com/barecoin/bare-project-translations/](https://www.transifex.com/barecoin/bare-project-translations/).
 
 ### Installing the Transifex client command-line tool
 
