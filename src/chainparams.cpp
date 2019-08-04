@@ -159,7 +159,7 @@ public:
         fHeadersFirstSyncingActive = false;
 
         nPoolMaxTransactions = 3;
-        strSporkKey = "043d984e3599782daa3065b9ddc5911f9059951e6e7578d704de0343fd259859042e0dad158e013c3cbbf13211d91838ff3ae3c3e37f930a95be149e51206d36fc";
+        strSporkKey = "04a8e3030242c007ca14373355bb62733aa635d3cda8225817750b1deee91751222870c860ba3bca6cb9583806f36617f0d248e01673a0f4ffea0722cb82a584a0";
         strDarksendPoolDummyAddress = "QZcAHb6H4TZkD9s4XqXzATwtTxcJgGx4jK";
         nStartMasternodePayments = 1559634300;
     }
