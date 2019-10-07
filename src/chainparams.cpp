@@ -134,9 +134,10 @@ public:
         assert(hashGenesisBlock == uint256("0x000000731191b78b71c7352a3f877e9429d5b26b67c41020e21dffb14f783b50"));
         assert(genesis.hashMerkleRoot == uint256("0x023b3b4bd3fb83cd05066b9d8104ebc5ba76f81ee9743533490e9dffa36a4379"));
 
-        vSeeds.push_back(CDNSSeedData("37.44.215.150", "37.44.215.150"));
-		vSeeds.push_back(CDNSSeedData("37.44.215.145", "37.44.215.145"));
-		vSeeds.push_back(CDNSSeedData("37.44.215.108", "37.44.215.108"));
+        vSeeds.push_back(CDNSSeedData("dns1", "dns1.bare.network"));
+	vSeeds.push_back(CDNSSeedData("dns2", "dns2.bare.network"));
+	vSeeds.push_back(CDNSSeedData("dns3", "dns3.bare.network"));
+	vSeeds.push_back(CDNSSeedData("dns4", "dns4.bare.network"));
 																	 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 25); //Bare adresses start with "B"
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 16);
