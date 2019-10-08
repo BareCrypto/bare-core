@@ -1619,41 +1619,41 @@ int64_t GetBlockValue(int nHeight)
 	if (nHeight == 0) return 35000 * COIN;
 
 	if(nHeight > 0 && nHeight <= 500) {
-        nSubsidy = 0.2 * COIN;
+        return = 0.2 * COIN;
 	} else if (nHeight > 500 && nHeight <= 20000) {
-		nSubsidy = 0.35 * COIN;
+		return = 0.35 * COIN;
 	} else if (nHeight > 20000 && nHeight <= 40000) {
-		nSubsidy = 0.4 * COIN;
+		return = 0.4 * COIN;
 	} else if (nHeight > 40000 && nHeight <= 60000) {
-		nSubsidy = 0.5 * COIN;
+		return = 0.5 * COIN;
 	} else if (nHeight > 60000 && nHeight <= 80000) {
-		nSubsidy = 0.6 * COIN;
+		return = 0.6 * COIN;
 	} else if (nHeight > 80000 && nHeight <= 120000) {
-		nSubsidy = 0.7 * COIN;
+		return = 0.7 * COIN;
 	} else if (nHeight > 120000 && nHeight <= 160000) {
-		nSubsidy = 0.8 * COIN;
+		return = 0.8 * COIN;
 	} else if (nHeight > 160000 && nHeight <= 200000) {
-		nSubsidy = 0.9 * COIN;
+		return = 0.9 * COIN;
 	} else if (nHeight > 200000 && nHeight <= 260000) {
-		nSubsidy = 1 * COIN;
+		return = 1 * COIN;
 	} else if (nHeight > 260000 && nHeight <= 340000) {
-		nSubsidy = 1.1 * COIN;
+		return = 1.1 * COIN;
 	} else if (nHeight > 340000 && nHeight <= 420000) {
-		nSubsidy = 1.15 * COIN;
+		return = 1.15 * COIN;
 	} else if (nHeight > 420000 && nHeight <= 520000) {  // first year supply 533k
-		nSubsidy = 1.2 * COIN;
+		return = 1.2 * COIN;
 	} else if (nHeight > 520000 && nHeight <= 620000) {
-		nSubsidy = 1.25 * COIN;
+		return = 1.25 * COIN;
 	} else if (nHeight > 620000 && nHeight <= 820000) {
-		nSubsidy = 1.3 * COIN;
+		return = 1.3 * COIN;
 	} else if (nHeight > 820000 && nHeight <= 1020000) { // second year
-		nSubsidy = 1.4 * COIN;
+		return = 1.4 * COIN;
     } else if (nHeight > 1020000 && nHeight <= 1545000) { // third year
-		nSubsidy = 1.5 * COIN;
+		return = 1.5 * COIN;
     } else if (nHeight > 1545000 && nHeight <= 2070600) { // fourth year
-		nSubsidy = 1.6 * COIN;
+		return = 1.6 * COIN;
 	} else if (nHeight > 2070600) {
-		nSubsidy = 0.1 * COIN;
+		return = 0.1 * COIN;
     return 0;
 }
 
