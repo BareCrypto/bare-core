@@ -1,5 +1,7 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2016-2018 The PIVX developers
+// Copyright (c) 2017 The Phore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -47,6 +49,7 @@ public:
     CBlockTreeDB(size_t nCacheSize, bool fMemory = false, bool fWipe = false);
 
 private:
+    uint256 salt;
     CBlockTreeDB(const CBlockTreeDB&);
     void operator=(const CBlockTreeDB&);
 
@@ -60,8 +63,12 @@ public:
     bool ReadReindexing(bool& fReindex);
     bool ReadTxIndex(const uint256& txid, CDiskTxPos& pos);
     bool WriteTxIndex(const std::vector<std::pair<uint256, CDiskTxPos> >& list);
+    bool ReadAddrIndex(uint160 addrid, std::vector<CExtDiskTxPos> &list);
+    bool AddAddrIndex(const std::vector<std::pair<uint160, CExtDiskTxPos> > &list);
     bool WriteFlag(const std::string& name, bool fValue);
     bool ReadFlag(const std::string& name, bool& fValue);
+    bool WriteInt(const std::string& name, int nValue);
+    bool ReadInt(const std::string& name, int& nValue);
     bool LoadBlockIndexGuts();
 };
 

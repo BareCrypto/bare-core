@@ -11,8 +11,7 @@
 
 #include "bitcoinunits.h"
 #include "guiutil.h"
-// Removing Darksend - BJK
-// #include "Darksend.h"
+#include "obfuscation.h"
 #include "optionsmodel.h"
 
 #include "main.h" // for MAX_SCRIPTCHECK_THREADS
@@ -60,6 +59,7 @@ OptionsDialog::OptionsDialog(QWidget* parent, bool enableWallet) : QDialog(paren
     connect(ui->connectSocks, SIGNAL(toggled(bool)), ui->proxyPort, SLOT(setEnabled(bool)));
 
     ui->proxyIp->installEventFilter(this);
+    ui->proxyPort->installEventFilter(this);
 
 /* Window elements init */
 #ifdef Q_OS_MAC
@@ -80,10 +80,9 @@ OptionsDialog::OptionsDialog(QWidget* parent, bool enableWallet) : QDialog(paren
         digits.setNum(index);
         ui->digits->addItem(digits, digits);
     }
-
+    
     /* Theme selector static themes */
     ui->theme->addItem(QString("Default"), QVariant("default"));
-	ui->theme->addItem(QString("Dark"), QVariant("dark"));
 
     /* Theme selector external themes */
     boost::filesystem::path pathAddr = GetDataDir() / "themes";
@@ -133,7 +132,7 @@ OptionsDialog::OptionsDialog(QWidget* parent, bool enableWallet) : QDialog(paren
     mapper->setOrientation(Qt::Vertical);
 
     /* setup/change UI elements when proxy IP is invalid/valid */
-    connect(this, SIGNAL(proxyIpChecks(QValidatedLineEdit*, int)), this, SLOT(doProxyIpChecks(QValidatedLineEdit*, int)));
+    connect(this, SIGNAL(proxyIpChecks(QValidatedLineEdit*, QLineEdit*)), this, SLOT(doProxyIpChecks(QValidatedLineEdit*, QLineEdit*)));
 }
 
 OptionsDialog::~OptionsDialog()
@@ -189,6 +188,7 @@ void OptionsDialog::setMapper()
     /* Wallet */
     mapper->addMapping(ui->spendZeroConfChange, OptionsModel::SpendZeroConfChange);
     mapper->addMapping(ui->coinControlFeatures, OptionsModel::CoinControlFeatures);
+    mapper->addMapping(ui->spinBoxStakeSplitThreshold, OptionsModel::StakeSplitThreshold);
 
     /* Network */
     mapper->addMapping(ui->mapPortUpnp, OptionsModel::MapPortUPnP);
@@ -198,7 +198,7 @@ void OptionsDialog::setMapper()
     mapper->addMapping(ui->proxyIp, OptionsModel::ProxyIP);
     mapper->addMapping(ui->proxyPort, OptionsModel::ProxyPort);
 
-/* Window */
+    /* Window */
 #ifndef Q_OS_MAC
     mapper->addMapping(ui->minimizeToTray, OptionsModel::MinimizeToTray);
     mapper->addMapping(ui->minimizeOnClose, OptionsModel::MinimizeOnClose);
@@ -211,15 +211,10 @@ void OptionsDialog::setMapper()
     mapper->addMapping(ui->lang, OptionsModel::Language);
     mapper->addMapping(ui->unit, OptionsModel::DisplayUnit);
     mapper->addMapping(ui->thirdPartyTxUrls, OptionsModel::ThirdPartyTxUrls);
+    mapper->addMapping(ui->checkBoxHideZeroBalances, OptionsModel::HideZeroBalances);
 
-
-    /* Darksend Rounds */
-    /* Removing Darksend - BJK
-    mapper->addMapping(ui->DarksendRounds, OptionsModel::DarksendRounds);
-    mapper->addMapping(ui->anonymizeAmount, OptionsModel::AnonymizeAmount);
-    */
+    /* Masternode Tab */
     mapper->addMapping(ui->showMasternodesTab, OptionsModel::ShowMasternodesTab);
-    
 }
 
 void OptionsDialog::enableOkButton()
@@ -259,10 +254,8 @@ void OptionsDialog::on_resetButton_clicked()
 void OptionsDialog::on_okButton_clicked()
 {
     mapper->submit();
-    /* Removing Darksend - BJK
-    DarKsendPool.cachedNumBlocks = std::numeric_limits<int>::max();
+    obfuScationPool.cachedNumBlocks = std::numeric_limits<int>::max();
     pwalletMain->MarkDirty();
-    */
     accept();
 }
 
@@ -290,30 +283,44 @@ void OptionsDialog::clearStatusLabel()
     ui->statusLabel->clear();
 }
 
-void OptionsDialog::doProxyIpChecks(QValidatedLineEdit* pUiProxyIp, int nProxyPort)
+void OptionsDialog::doProxyIpChecks(QValidatedLineEdit* pUiProxyIp, QLineEdit* pUiProxyPort)
 {
-    Q_UNUSED(nProxyPort);
-
     const std::string strAddrProxy = pUiProxyIp->text().toStdString();
     CService addrProxy;
 
-    /* Check for a valid IPv4 / IPv6 address */
+    // Check for a valid IPv4 / IPv6 address
     if (!(fProxyIpValid = LookupNumeric(strAddrProxy.c_str(), addrProxy))) {
         disableOkButton();
         pUiProxyIp->setValid(false);
         ui->statusLabel->setStyleSheet("QLabel { color: red; }");
         ui->statusLabel->setText(tr("The supplied proxy address is invalid."));
-    } else {
-        enableOkButton();
-        ui->statusLabel->clear();
+        return;
     }
+    // Check proxy port
+    if (!pUiProxyPort->hasAcceptableInput()){
+        disableOkButton();
+        ui->statusLabel->setStyleSheet("QLabel { color: red; }");
+        ui->statusLabel->setText(tr("The supplied proxy port is invalid."));
+        return;
+    }
+
+    proxyType checkProxy = proxyType(addrProxy);
+    if (!checkProxy.IsValid()) {
+        disableOkButton();
+        ui->statusLabel->setStyleSheet("QLabel { color: red; }");
+        ui->statusLabel->setText(tr("The supplied proxy settings are invalid."));
+        return;
+    }
+
+    enableOkButton();
+    ui->statusLabel->clear();
 }
 
 bool OptionsDialog::eventFilter(QObject* object, QEvent* event)
 {
     if (event->type() == QEvent::FocusOut) {
-        if (object == ui->proxyIp) {
-            emit proxyIpChecks(ui->proxyIp, ui->proxyPort->text().toInt());
+        if (object == ui->proxyIp || object == ui->proxyPort) {
+            emit proxyIpChecks(ui->proxyIp, ui->proxyPort);
         }
     }
     return QDialog::eventFilter(object, event);

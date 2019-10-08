@@ -5,11 +5,9 @@ Various coding styles have been used during the history of the codebase,
 and the result is not very consistent. However, we're now trying to converge to
 a single style, so please use it in new code. Old code will be converted
 gradually.
-
 - Basic rules specified in [src/.clang-format](/src/.clang-format).
   Use a recent clang-format to format automatically using one of the [dev scripts]
   (/contrib/devtools/README.md#clang-formatpy).
-
   - Braces on new lines for namespaces, classes, functions, methods.
   - Braces on the same line for everything else.
   - 4 space indentation (no tabs) for every block except namespaces.
@@ -18,7 +16,6 @@ gradually.
   - No space after function names; one space after if, for and while.
 
 Block style example:
-
 ```c++
 namespace foo
 {
@@ -42,12 +39,11 @@ class Class
 ```
 
 Doxygen comments
-----------------
+-----------------
 
 To facilitate the generation of documentation, use doxygen-compatible comment blocks for functions, methods and fields.
 
 For example, to describe a function use:
-
 ```c++
 /**
  * ... text ...
@@ -57,13 +53,11 @@ For example, to describe a function use:
  */
 bool function(int arg1, const char *arg2)
 ```
-
 A complete list of `@xxx` commands can be found at http://www.stack.nl/~dimitri/doxygen/manual/commands.html.
 As Doxygen recognizes the comments by the delimiters (`/**` and `*/` in this case), you don't
 *need* to provide any commands for a comment to be valid; just a description text is fine.
 
 To describe a class use the same construct above the class definition:
-
 ```c++
 /**
  * Alerts are for notifying old versions if they become too obsolete and
@@ -75,20 +69,17 @@ class CAlert
 ```
 
 To describe a member or variable use:
-
 ```c++
 int var; //!< Detailed description after the member
 ```
 
 or
-
 ```cpp
 //! Description before the member
 int var;
 ```
 
 Also OK:
-
 ```c++
 ///
 /// ... text ...
@@ -97,7 +88,6 @@ bool function2(int arg1, const char *arg2)
 ```
 
 Not OK (used plenty in the current source, but not picked up):
-
 ```c++
 //
 // ... text ...
@@ -128,7 +118,7 @@ to see it.
 
 **testnet mode**
 
-Run with the -testnet option to run with "play WBRs (tWBR)" on the test network, if you
+Run with the -testnet option to run with "play BAREs (tBARE)" on the test network, if you
 are testing multi-machine code that needs to operate across the internet.
 
 **DEBUG_LOCKORDER**
@@ -187,7 +177,7 @@ Threads
 - Shutdown : Does an orderly shutdown of everything.
 
 Ignoring IDE/editor files
--------------------------
+--------------------------
 
 In closed-source environments in which everyone uses the same IDE it is common
 to add temporary files it produces to the project-wide `.gitignore` file.
@@ -206,7 +196,6 @@ to do this is thus to create your local gitignore. Add this to `~/.gitconfig`:
 on a terminal)
 
 Then put your favourite tool's temporary filenames in that file, e.g.
-
 ```
 # NetBeans
 nbproject/
@@ -220,13 +209,13 @@ example, lcov) it is perfectly acceptable to add its files to `.gitignore`
 and commit them.
 
 Development guidelines
-======================
+============================
 
 A few non-style-related recommendations for developers, as well as points to
 pay attention to for reviewers of Bare Core code.
 
 General Bare Core
------------------
+----------------------
 
 - New features should be exposed on RPC first, then can be made available in the GUI
 
@@ -243,7 +232,7 @@ General Bare Core
     be done first
 
 Wallet
-------
+-------
 
 - Make sure that no crashes happen with run-time option `-disablewallet`.
 
@@ -257,7 +246,7 @@ Wallet
   - *Rationale*: Otherwise compilation of the disable-wallet build will fail in environments without BerkeleyDB
 
 General C++
------------
+-------------
 
 - Assertions should not have side-effects
 
@@ -277,7 +266,7 @@ General C++
   - *Rationale*: This avoids memory and resource leaks, and ensures exception safety
 
 C++ data structures
--------------------
+--------------------
 
 - Never use the `std::map []` syntax when reading from a map, but instead use `.find()`
 
@@ -316,7 +305,7 @@ C++ data structures
   that are not language lawyers
 
 Strings and formatting
-----------------------
+------------------------
 
 - Be careful of `LogPrint` versus `LogPrintf`. `LogPrint` takes a `category` argument, `LogPrintf` does not.
 
@@ -338,7 +327,7 @@ Strings and formatting
   - *Rationale*: Bare Core uses tinyformat, which is type safe. Leave them out to avoid confusion
 
 Threads and synchronization
----------------------------
+----------------------------
 
 - Build and run tests with `-DDEBUG_LOCKORDER` to verify that no potential
   deadlocks are introduced.
@@ -366,7 +355,7 @@ TRY_LOCK(cs_vNodes, lockNodes);
 ```
 
 Source code organization
-------------------------
+--------------------------
 
 - Implementation code should go into the `.cpp` file and not the `.h`, unless necessary due to template usage or
   when performance due to inlining is critical
@@ -379,7 +368,7 @@ Source code organization
   - *Rationale*: Avoids symbol conflicts
 
 GUI
----
+-----
 
 - Do not display or manipulate dialogs in model code (classes `*Model`)
 
@@ -388,7 +377,7 @@ GUI
     holds: try to not directly access core data structures from Views.
 
 Git and github tips
--------------------
+---------------------
 
 - For resolving merge/rebase conflicts, it can be useful to enable diff3 style using
   `git config merge.conflictstyle diff3`. Instead of
@@ -429,7 +418,7 @@ Git and github tips
 
         [remote "upstream-pull"]
                 fetch = +refs/pull/*:refs/remotes/upstream-pull/*
-                url = git@github.com:barecoin/bare-core.git
+                url = git@github.com:crypto-node/bare-core.git
 
   This will add an `upstream-pull` remote to your git repository, which can be fetched using `git fetch --all`
   or `git fetch upstream-pull`. Afterwards, you can use `upstream-pull/NUMBER/head` in arguments to `git show`,

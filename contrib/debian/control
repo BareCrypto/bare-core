@@ -1,8 +1,8 @@
 Source: bare
 Section: utils
 Priority: optional
-Maintainer: Jonas Smedegaard <dr@jones.dk> ***TODO***
-Uploaders: Micah Anderson <micah@debian.org> ***TODO***
+Maintainer: Mike Trisko <mike@phore.io>
+Uploaders: Mike Trisko <mike@phore.io>
 Build-Depends: debhelper,
  devscripts,
  automake,
@@ -22,9 +22,9 @@ Build-Depends: debhelper,
  libqrencode-dev,
  libprotobuf-dev, protobuf-compiler
 Standards-Version: 3.9.2
-Homepage:http://bit.bares/
-Vcs-Git: git://github.com/BareCrypto/bare-core/bare-core
-Vcs-Browser: http://github.com/BareCrypto/bare-core/bare-core
+Homepage: http://www.bare.org
+Vcs-Git: git://github.com/crypto-node/bare-core.git
+Vcs-Browser: http://github.com/crypto-node/bare-core
 
 Package: bared
 Architecture: any

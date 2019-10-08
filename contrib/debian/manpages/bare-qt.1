@@ -41,7 +41,7 @@ Use proxy to reach tor hidden services (default: same as \fB\-proxy\fR)
 Allow DNS lookups for \fB\-addnode\fR, \fB\-seednode\fR and \fB\-connect\fR
 .TP
 \fB\-port=\fR<port>
-Listen for connections on <port> (default: 27003 or testnet: 23660)
+Listen for connections on <port> (default: 19687 or testnet: 19685)
 .TP
 \fB\-maxconnections=\fR<n>
 Maintain at most <n> connections to peers (default: 125)
@@ -122,16 +122,23 @@ Username for JSON\-RPC connections
 Password for JSON\-RPC connections
 .TP
 \fB\-rpcport=\fR<port>
-Listen for JSON\-RPC connections on <port> (default: 27004)
+Listen for JSON\-RPC connections on <port> (default: 19688 or testnet: 19686)
 .TP
 \fB\-rpcallowip=\fR<ip>
 Allow JSON\-RPC connections from specified IP address
+.TP
+\fB\-rpcserialversion=\fR<n>
+Sets the serialization of raw transaction or block hex returned in
+non\-verbose mode, non\-segwit(0) or segwit(1) (default: 1)
 .TP
 \fB\-rpcthreads=\fR<n>
 Set the number of threads to service RPC calls (default: 4)
 .TP
 \fB\-blocknotify=\fR<cmd>
 Execute command when the best block changes (%s in cmd is replaced by block hash)
+.TP
+\fB\-mempoolnotify=\fR<cmd>
+Execute command when a new transaction is accepted to the mempool (%s in cmd is replaced by transaction hash)
 .TP
 \fB\-walletnotify=\fR<cmd>
 Execute command when a wallet transaction changes (%s in cmd is replaced by TxID)
@@ -174,23 +181,13 @@ Set the number of script verification threads (1\-16, 0=auto, default: 0)
 Set minimum block size in bytes (default: 0)
 .TP
 \fB\-blockmaxsize=\fR<n>
-Set maximum block size in bytes (default: 250000)
+Set maximum block size in bytes (default: 750000)
+.HP
+\fB\-blockmaxcost=\fR<n>
+Set maximum block cost (default: 3000000)
 .HP
 \fB\-blockprioritysize=\fR<n> Set maximum size of high\-priority/low\-fee transactions in bytes (default: 27000)
 .PP
-SSL options: (see the Bitcoin Wiki for SSL setup instructions)
-.TP
-\fB\-rpcssl\fR
-Use OpenSSL (https) for JSON\-RPC connections
-.TP
-\fB\-rpcsslcertificatechainfile=\fR<file.cert>
-Server certificate file (default: server.cert)
-.TP
-\fB\-rpcsslprivatekeyfile=\fR<file.pem>
-Server private key (default: server.pem)
-.TP
-\fB\-rpcsslciphers=\fR<ciphers>
-Acceptable ciphers (default: TLSv1+HIGH:!SSLv2:!aNULL:!eNULL:!AH:!3DES:@STRENGTH)
 .SS "UI options:"
 .TP
 \fB\-lang=\fR<lang>

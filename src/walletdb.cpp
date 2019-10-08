@@ -1,18 +1,19 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2017 The PIVX developers 
-// Copyright (c) 2015-2017 The ALQO developers
-// Copyright (c) 2017-2019 The Bare developers
+// Copyright (c) 2015-2018 The PIVX developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "walletdb.h"
 
 #include "base58.h"
+#include "consensus/validation.h"
 #include "protocol.h"
 #include "serialize.h"
+#include "spork.h"
 #include "sync.h"
+#include "txdb.h"
 #include "util.h"
 #include "utiltime.h"
 #include "wallet.h"
@@ -131,6 +132,18 @@ bool CWalletDB::EraseWatchOnly(const CScript& dest)
     return Erase(std::make_pair(std::string("watchs"), dest));
 }
 
+bool CWalletDB::WriteMultiSig(const CScript& dest)
+{
+    nWalletDBUpdated++;
+    return Write(std::make_pair(std::string("multisig"), dest), '1');
+}
+
+bool CWalletDB::EraseMultiSig(const CScript& dest)
+{
+    nWalletDBUpdated++;
+    return Erase(std::make_pair(std::string("multisig"), dest));
+}
+
 bool CWalletDB::WriteBestBlock(const CBlockLocator& locator)
 {
     nWalletDBUpdated++;
@@ -212,29 +225,14 @@ bool CWalletDB::EraseMSDisabledAddresses(std::vector<std::string> vDisabledAddre
     }
     return ret;
 }
-/*
-bool CWalletDB::WriteAutoCombineSettings(bool fEnable, CAmount nCombineThreshold, CAmount nThresholdnAutoCombineThresholdTime)
+bool CWalletDB::WriteAutoCombineSettings(bool fEnable, CAmount nCombineThreshold)
 {
     nWalletDBUpdated++;
     std::pair<bool, CAmount> pSettings;
     pSettings.first = fEnable;
     pSettings.second = nCombineThreshold;
-	pSettings.second = nThresholdnAutoCombineThresholdTime;
     return Write(std::string("autocombinesettings"), pSettings, true);
 }
-*/
-
-bool CWalletDB::WriteAutoCombineSettings(bool fEnable, CAmount nCombineThreshold, int nThresholdnAutoCombineThresholdTime)
-{
-    nWalletDBUpdated++;
-	std::pair<bool, CAmount> enabledMS1(fEnable, nCombineThreshold);
-    std::pair<std::pair<bool, CAmount>,int> pSettings(enabledMS1, nThresholdnAutoCombineThresholdTime);
-	//std::pair<bool, CAmount> pSettings;
-    //pSettings.first = fEnable;
-    //pSettings.second = nCombineThreshold;
-	//	wert.first = nThresholdnAutoCombineThresholdTime;
-    return Write(std::string("autocombinesettings"), pSettings, true);
-} 
 
 bool CWalletDB::WriteDefaultKey(const CPubKey& vchPubKey)
 {
@@ -280,7 +278,7 @@ bool CWalletDB::WriteAccountingEntry(const uint64_t nAccEntryNum, const CAccount
     return Write(std::make_pair(std::string("acentry"), std::make_pair(acentry.strAccount, nAccEntryNum)), acentry);
 }
 
-bool CWalletDB::WriteAccountingEntry(const CAccountingEntry& acentry)
+bool CWalletDB::WriteAccountingEntry_Backend(const CAccountingEntry& acentry)
 {
     return WriteAccountingEntry(++nAccountingEntryNumber, acentry);
 }
@@ -431,18 +429,18 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
         if (strType == "name") {
             string strAddress;
             ssKey >> strAddress;
-            ssValue >> pwallet->mapAddressBook[CBitcoinAddress(strAddress).Get()].name;
+            ssValue >> pwallet->mapAddressBook[DecodeDestination(strAddress)].name;
         } else if (strType == "purpose") {
             string strAddress;
             ssKey >> strAddress;
-            ssValue >> pwallet->mapAddressBook[CBitcoinAddress(strAddress).Get()].purpose;
+            ssValue >> pwallet->mapAddressBook[DecodeDestination(strAddress)].purpose;
         } else if (strType == "tx") {
             uint256 hash;
             ssKey >> hash;
             CWalletTx wtx;
             ssValue >> wtx;
             CValidationState state;
-            if (!(CheckTransaction(wtx, state) && (wtx.GetHash() == hash) && state.IsValid()))
+            if (!(CheckTransaction(wtx, false, state, IsSporkActive(SPORK_17_SEGWIT_ACTIVATION)) && (wtx.GetHash() == hash) && state.IsValid()))
                 return false;
 
             // Undo serialize changes in 31600
@@ -488,6 +486,17 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
                 pwallet->LoadWatchOnly(script);
 
             // Watch-only addresses have no birthday information for now,
+            // so set the wallet birthday to the beginning of time.
+            pwallet->nTimeFirstKey = 1;
+        } else if (strType == "multisig") {
+            CScript script;
+            ssKey >> script;
+            char fYes;
+            ssValue >> fYes;
+            if (fYes == '1')
+                pwallet->LoadMultiSig(script);
+
+            // MultiSig addresses have no birthday information for now,
             // so set the wallet birthday to the beginning of time.
             pwallet->nTimeFirstKey = 1;
         } else if (strType == "key" || strType == "wkey") {
@@ -621,7 +630,7 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
             ssKey >> i;
             std::pair<std::string, int> pMultiSend;
             ssValue >> pMultiSend;
-            if (CBitcoinAddress(pMultiSend.first).IsValid()) {
+            if (IsValidDestinationString(pMultiSend.first)) {
                 pwallet->vMultiSend.push_back(pMultiSend);
             }
         } else if (strType == "msettingsv2") //presstab HyperStake
@@ -637,27 +646,16 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
             ssValue >> strDisabledAddress;
             pwallet->vDisabledAddresses.push_back(strDisabledAddress);
         } else if (strType == "autocombinesettings") {
-			
-			/*
             std::pair<bool, CAmount> pSettings;
             ssValue >> pSettings;
             pwallet->fCombineDust = pSettings.first;
             pwallet->nAutoCombineThreshold = pSettings.second;
-			pwallet->nAutoCombineThresholdTime = pSettings.second;
-			*/
-			
-			std::pair<std::pair<bool, CAmount>,int> pSettings;
-			ssValue >> pSettings;
-			pwallet->fCombineDust = pSettings.first.first;
-			pwallet->nAutoCombineThreshold = pSettings.first.second;
-			pwallet->nAutoCombineThresholdTime = pSettings.second;
-			
-			} else if (strType == "destdata") {
+        } else if (strType == "destdata") {
             std::string strAddress, strKey, strValue;
             ssKey >> strAddress;
             ssKey >> strKey;
             ssValue >> strValue;
-            if (!pwallet->LoadDestData(CBitcoinAddress(strAddress).Get(), strKey, strValue)) {
+            if (!pwallet->LoadDestData(DecodeDestination(strAddress), strKey, strValue)) {
                 strErr = "Error reading wallet database: LoadDestData failed";
                 return false;
             }
@@ -699,8 +697,8 @@ DBErrors CWalletDB::LoadWallet(CWallet* pwallet)
 
         while (true) {
             // Read next record
-            CDataStream ssKey(SER_DISK, CLIENT_VERSION);
-            CDataStream ssValue(SER_DISK, CLIENT_VERSION);
+            CDataStream ssKey(SER_DISK, nSerVersion);
+            CDataStream ssValue(SER_DISK, nSerVersion);
             int ret = ReadAtCursor(pcursor, ssKey, ssValue);
             if (ret == DB_NOTFOUND)
                 break;
@@ -764,6 +762,12 @@ DBErrors CWalletDB::LoadWallet(CWallet* pwallet)
     if (wss.fAnyUnordered)
         result = ReorderTransactions(pwallet);
 
+    pwallet->laccentries.clear();
+    ListAccountCreditDebit("*", pwallet->laccentries);
+    BOOST_FOREACH(CAccountingEntry& entry, pwallet->laccentries) {
+        pwallet->wtxOrdered.insert(make_pair(entry.nOrderPos, CWallet::TxPair((CWalletTx*)0, &entry)));
+    }
+
     return result;
 }
 
@@ -791,8 +795,8 @@ DBErrors CWalletDB::FindWalletTx(CWallet* pwallet, vector<uint256>& vTxHash, vec
 
         while (true) {
             // Read next record
-            CDataStream ssKey(SER_DISK, CLIENT_VERSION);
-            CDataStream ssValue(SER_DISK, CLIENT_VERSION);
+            CDataStream ssKey(SER_DISK, nSerVersion);
+            CDataStream ssValue(SER_DISK, nSerVersion);
             int ret = ReadAtCursor(pcursor, ssKey, ssValue);
             if (ret == DB_NOTFOUND)
                 break;
@@ -899,10 +903,36 @@ void ThreadFlushWalletDB(const string& strFile)
     }
 }
 
-bool BackupWallet(const CWallet& wallet, const string& strDest)
+void NotifyBacked(const CWallet& wallet, bool fSuccess, string strMessage)
 {
-    if (!wallet.fFileBacked)
+    LogPrintf("%s", strMessage.data());
+    wallet.NotifyWalletBacked(fSuccess, strMessage);
+}
+
+bool BackupWallet(const CWallet& wallet, const filesystem::path& strDest, bool fEnableCustom)
+{
+    filesystem::path pathCustom;
+    filesystem::path pathWithFile;
+    if (!wallet.fFileBacked) {
         return false;
+    } else if(fEnableCustom) {
+        pathWithFile = GetArg("-backuppath", "");
+        if(!pathWithFile.empty()) {
+            if(!pathWithFile.has_extension()) {
+                pathCustom = pathWithFile;
+                pathWithFile /= wallet.GetUniqueWalletBackupName();
+            } else {
+                pathCustom = pathWithFile.parent_path();
+            }
+            try {
+                filesystem::create_directories(pathCustom);
+            } catch(const filesystem::filesystem_error& e) {
+                NotifyBacked(wallet, false, strprintf("%s\n", e.what()));
+                pathCustom = "";
+            }
+        }
+    }
+
     while (true) {
         {
             LOCK(bitdb.cs_db);
@@ -913,30 +943,102 @@ bool BackupWallet(const CWallet& wallet, const string& strDest)
                 bitdb.mapFileUseCount.erase(wallet.strWalletFile);
 
                 // Copy wallet.dat
-                filesystem::path pathSrc = GetDataDir() / wallet.strWalletFile;
                 filesystem::path pathDest(strDest);
-                if (filesystem::is_directory(pathDest))
+                filesystem::path pathSrc = GetDataDir() / wallet.strWalletFile;
+                if (is_directory(pathDest)) {
+                    if (!exists(pathDest)) create_directory(pathDest);
                     pathDest /= wallet.strWalletFile;
-
-                try {
-#if BOOST_VERSION >= 158000
-                    filesystem::copy_file(pathSrc, pathDest, filesystem::copy_option::overwrite_if_exists);
-#else
-                    std::ifstream src(pathSrc.string(), std::ios::binary);
-                    std::ofstream dst(pathDest.string(), std::ios::binary);
-                    dst << src.rdbuf();
-#endif
-                    LogPrintf("copied wallet.dat to %s\n", pathDest.string());
-                    return true;
-                } catch (const filesystem::filesystem_error& e) {
-                    LogPrintf("error copying wallet.dat to %s - %s\n", pathDest.string(), e.what());
-                    return false;
                 }
+                bool defaultPath = AttemptBackupWallet(wallet, pathSrc.string(), pathDest.string());
+
+                if(defaultPath && !pathCustom.empty()) {
+                    int nThreshold = GetArg("-custombackupthreshold", DEFAULT_CUSTOMBACKUPTHRESHOLD);
+                    if (nThreshold > 0) {
+
+                        typedef std::multimap<std::time_t, filesystem::path> folder_set_t;
+                        folder_set_t folderSet;
+                        filesystem::directory_iterator end_iter;
+
+                        pathCustom.make_preferred();
+                        // Build map of backup files for current(!) wallet sorted by last write time
+
+                        filesystem::path currentFile;
+                        for (filesystem::directory_iterator dir_iter(pathCustom); dir_iter != end_iter; ++dir_iter) {
+                            // Only check regular files
+                            if (filesystem::is_regular_file(dir_iter->status())) {
+                                currentFile = dir_iter->path().filename();
+                                // Only add the backups for the current wallet, e.g. wallet.dat.*
+                                if (dir_iter->path().stem().string() == wallet.strWalletFile) {
+                                    folderSet.insert(folder_set_t::value_type(filesystem::last_write_time(dir_iter->path()), *dir_iter));
+                                }
+                            }
+                        }
+
+                        int counter = 0; //TODO: add seconds to avoid naming conflicts
+                        for (auto entry : folderSet) {
+                            counter++;
+                            if(entry.second == pathWithFile) {
+                                pathWithFile += "(1)";
+                            }
+                        }
+
+                        if (counter >= nThreshold) {
+                            std::time_t oldestBackup = 0;
+                            for(auto entry : folderSet) {
+                                if(oldestBackup == 0 || entry.first < oldestBackup) {
+                                    oldestBackup = entry.first;
+                                }
+                            }
+
+                            try {
+                                auto entry = folderSet.find(oldestBackup);
+                                if (entry != folderSet.end()) {
+                                    filesystem::remove(entry->second);
+                                    LogPrintf("Old backup deleted: %s\n", (*entry).second);
+                                }
+                            } catch (filesystem::filesystem_error& error) {
+                                string strMessage = strprintf("Failed to delete backup %s\n", error.what());
+                                LogPrint(nullptr, strMessage.data());
+                                NotifyBacked(wallet, false, strMessage);
+                            }
+                        }
+                    }
+                    AttemptBackupWallet(wallet, pathSrc.string(), pathWithFile.string());
+                }
+
+                return defaultPath;
             }
         }
         MilliSleep(100);
     }
     return false;
+}
+
+bool AttemptBackupWallet(const CWallet& wallet, const filesystem::path& pathSrc, const filesystem::path& pathDest)
+{
+    bool retStatus;
+    string strMessage;
+    try {
+#if BOOST_VERSION >= 105800 /* BOOST_LIB_VERSION 1_58 */
+        filesystem::copy_file(pathSrc.c_str(), pathDest, filesystem::copy_option::overwrite_if_exists);
+#else
+        std::ifstream src(pathSrc.c_str(),  std::ios::binary | std::ios::in);
+        std::ofstream dst(pathDest.c_str(), std::ios::binary | std::ios::out | std::ios::trunc);
+        dst << src.rdbuf();
+        dst.flush();
+        src.close();
+        dst.close();
+#endif
+        strMessage = strprintf("copied wallet.dat to %s\n", pathDest.string());
+        LogPrint(nullptr, strMessage.data());
+        retStatus = true;
+    } catch (const filesystem::filesystem_error& e) {
+        retStatus = false;
+        strMessage = strprintf("%s\n", e.what());
+        LogPrint(nullptr, strMessage.data());
+    }
+    NotifyBacked(wallet, retStatus, strMessage);
+    return retStatus;
 }
 
 //

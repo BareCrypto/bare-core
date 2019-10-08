@@ -2,7 +2,8 @@
 Encoding=UTF-8
 Name=Bare
 Comment=Bare P2P Cryptocurrency
-Comment[fr]=Bare, monnaie virtuelle cryptographique pair à pair
+Comment[de]=Bare, eine P2P Kryptowährung
+Comment[fr]=Bare, devise pair à pair cryptographique
 Comment[tr]=Bare, eşten eşe kriptografik sanal para birimi
 Exec=bare-qt %u
 Terminal=false

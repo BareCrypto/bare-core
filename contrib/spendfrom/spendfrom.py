@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 #
-# Use the raw transactions API to spend WBRs received on particular addresses,
+# Use the raw transactions API to spend BAREs received on particular addresses,
 # and send any change back to that same address.
 #
 # Example usage:
 #  spendfrom.py  # Lists available funds
 #  spendfrom.py --from=ADDRESS --to=ADDRESS --amount=11.00
 #
-# Assumes it will talk to a bared or Bare-Qt running
+# Assumes it will talk to a bared or bare-Qt running
 # on localhost.
 #
 # Depends on jsonrpc
@@ -26,7 +26,7 @@ from jsonrpc import ServiceProxy, json
 BASE_FEE=Decimal("0.001")
 
 def check_json_precision():
-    """Make sure JSON library being used does not lose precision converting BARE values"""
+    """Make sure json library being used does not lose precision converting BTC values"""
     n = Decimal("20000000.00000003")
     satoshis = int(json.loads(json.dumps(float(n)))*1.0e8)
     if satoshis != 2000000000000003:
@@ -67,7 +67,7 @@ def connect_JSON(config):
     testnet = config.get('testnet', '0')
     testnet = (int(testnet) > 0)  # 0/1 in config file, convert to True/False
     if not 'rpcport' in config:
-        config['rpcport'] = 27004 if testnet else 23661
+        config['rpcport'] = 19686 if testnet else 19688
     connect = "http://%s:%s@127.0.0.1:%s"%(config['rpcuser'], config['rpcpassword'], config['rpcport'])
     try:
         result = ServiceProxy(connect)
@@ -152,7 +152,7 @@ def create_tx(bared, fromaddresses, toaddress, amount, fee):
         total_available += all_coins[addr]["total"]
 
     if total_available < needed:
-        sys.stderr.write("Error, only %f BARE available, need %f\n"%(total_available, needed));
+        sys.stderr.write("Error, only %f BTC available, need %f\n"%(total_available, needed));
         sys.exit(1)
 
     #
@@ -221,9 +221,9 @@ def main():
 
     parser = optparse.OptionParser(usage="%prog [options]")
     parser.add_option("--from", dest="fromaddresses", default=None,
-                      help="addresses to get WBRs from")
+                      help="addresses to get BAREs from")
     parser.add_option("--to", dest="to", default=None,
-                      help="address to get send WBRs to")
+                      help="address to get send BAREs to")
     parser.add_option("--amount", dest="amount", default=None,
                       help="amount to send")
     parser.add_option("--fee", dest="fee", default="0.0",

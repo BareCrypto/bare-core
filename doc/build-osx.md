@@ -1,12 +1,11 @@
 Mac OS X Build Instructions and Notes
-=====================================
-
+====================================
 This guide will show you how to build bared (headless client) for OSX.
 
 Notes
 -----
 
-* Tested on OS X 10.7 through 10.10 on 64-bit Intel processors only.
+* Tested on OS X 10.7 through 10.10 on 64-bit Intel processors only. Please read carefully if you are building on High Sierra (10.13), there are special instructions.
 
 * All of the commands should be executed in a Terminal application. The
 built-in one is located in `/Applications/Utilities`.
@@ -39,38 +38,40 @@ Instructions: Homebrew
 
 #### Install dependencies using Homebrew
 
-        brew install autoconf automake berkeley-db4 libtool boost@1.55 miniupnpc openssl pkg-config protobuf qt5
-        brew link --force boost@1.55
+        brew install autoconf automake berkeley-db4 libtool boost miniupnpc openssl pkg-config protobuf qt5 zeromq libevent
+        
+        Note: On OSX versions lower than High Sierra, zeromq should be replaced with libzmq
 
 ### Building `bared`
 
 1. Clone the github tree to get the source code and go into the directory.
 
-        git clone https://github.com/BareCrypto/bare-core/bare-core
-        cd bare-core
+        git clone https://github.com/crypto-node.git
+        cd Bare
 
-2. Make the Homebrew OpenSSL headers visible to the configure script  (do ```brew info openssl``` to find out why this is necessary, or if you use Homebrew with installation folders different from the default).
-
-        export LDFLAGS=-L/usr/local/opt/openssl/lib
-        export CPPFLAGS=-I/usr/local/opt/openssl/include
-
-3. Build bared:
-
+2.  Make the Homebrew OpenSSL headers visible to the configure script  (do ```brew info openssl``` to find out why this is necessary, or if you use Homebrew with installation folders different from the default).
+         export LDFLAGS+=-L/usr/local/opt/openssl/lib
+        export CPPFLAGS+=-I/usr/local/opt/openssl/include
+        
+3.  Build bared:
+        
+        chmod +x share/genbuild.sh autogen.sh 
         ./autogen.sh
-        ./configure --with-gui=qt5
+        ./configure --with-gui=qt5 
         make
+(note: if configure fails with libprotobuf not found see [Troubleshooting](#trouble) at the bottom)
 
-4. It is also a good idea to build and run the unit tests:
+
+4.  It is also a good idea to build and run the unit tests:
 
         make check
 
-5. (Optional) You can also install bared to your path:
+5.  (Optional) You can also install bared to your path:
 
         make install
 
 Use Qt Creator as IDE
----------------------
-
+------------------------
 You can use Qt Creator as IDE, for debugging and for manipulating forms, etc.
 Download Qt Creator from http://www.qt.io/download/. Download the "community edition" and only install Qt Creator (uncheck the rest during the installation process).
 
@@ -87,10 +88,9 @@ Download Qt Creator from http://www.qt.io/download/. Download the "community edi
 
 Creating a release build
 ------------------------
-
 You can ignore this section if you are building `bared` for your own use.
 
-bared/bare-cli binaries are not included in the Bare-Qt.app bundle.
+bared/bare-cli binaries are not included in the bare-Qt.app bundle.
 
 If you are building `bared` or `bare-qt` for others, your build machine should be set up
 as follows for maximum compatibility:
@@ -122,9 +122,97 @@ you can monitor its process by looking at the debug.log file, like this:
 
     tail -f $HOME/Library/Application\ Support/Bare/debug.log
 
-Other commands
---------------
+Other commands:
+-------
 
     ./bared -daemon # to start the bare daemon.
     ./bare-cli --help  # for a list of command-line options.
     ./bare-cli help    # When the daemon is running, to get a list of RPC commands
+    
+Troubleshooting:<a name="trouble"></a>
+---------
+* brew install not working? Try replacing zeromq with libzmq in the brew install command
+                
+* libprotobuf not found during ./configure? Make sure you have installed protobuf with `brew install protobuf` and then run `export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig` and try again
+                
+* Database errors have been seen in builds on High Sierra. One solution is to build Berkeley DB from source.
+        
+        cd ~
+        wget 'http://download.oracle.com/berkeley-db/db-4.8.30.NC.tar.gz'
+        tar -xzvf db-4.8.30.NC.tar.gz
+        cd db-4.8.30.NC/build_unix/
+        ../dist/configure --enable-cxx
+        make
+        sudo make install
+
+        Then configure Bare with this build of BerkeleyDB,
+        ./configure --with-gui=qt5  LDFLAGS="-L/usr/local/BerkeleyDB.4.8/lib/" CPPFLAGS="-I/usr/local/BerkeleyDB.4.8/include/"
+                
+        
+* In the case you see: `configure: error: OpenSSL ec header missing`, run the following commands:
+
+        export LDFLAGS=-L/usr/local/opt/openssl/lib
+        export CPPFLAGS=-I/usr/local/opt/openssl/include
+
+### Building Qt wallet for OSX High Sierra
+
+Currently the gitian build is not supported for Mac OSX High Sierra, but a Qt wallet can be built natively on a OSX High Sierra machine. These instructions provide the steps to perform that build from source code.
+
+If you do not have XCode instlled, go to the Mac App Store and install it.
+
+If you already had homebrew installed, you likely have a newer version that we need of boost, which will cause problems. Uninstall boost first. We need version 1.57 to compile the wallet.
+
+Otherwise, open Terminal and type in the command to install homebrew:
+
+```/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"```
+
+The use homebrew to install a number of unix programs and libraries needed to build the Bare wallet:
+
+```brew install autoconf automake berkeley-db@4 boost@1.57 git libevent libtool miniupnpc openssl pkg-config protobuf qt zeromq```
+
+To have the build process use the proper version of boost, link that version as follows:
+
+```brew link boost@1.57 --force```
+
+Next, switch into your Downloads folder:
+
+```cd ~/Downloads```
+
+The next step is to download the current version of the wallet from Github and go into that directory:
+
+```git clone https://github.com/crypto-node.git```
+```cd Bare```
+
+Now set some configuration flags:
+
+export LDFLAGS=-L/usr/local/opt/openssl/lib;export CPPFLAGS=-I/usr/local/opt/openssl/include
+
+Then we begin the build process:
+
+```./autogen.sh```
+```./configure```
+```make```
+
+You have the choice to build the GUI Bare wallet as a Mac OSX app, described in “How to build the Bare-Qt App”. If, for whatever reason, you prefer to use the command line tools, continue with “Command line tools”.
+
+### How to build the Bare-Qt App:
+
+After make is finished, you can create an App bundle inside a disk image with:
+
+```make deploy```
+
+Once this is done, you’ll find Bare-Qt.dmg inside your Bare folder. Open and install the wallet like any typical Mac app.
+
+### Command line tools
+
+Once the build is complete, switch into the src/qt subdirectory:
+
+```cd src/qt```
+
+And there you have your wallet – you can start it by running:
+
+```./bare-qt```
+
+You can move the wallet app to another more permanent location. If you have not moved it and want to start your wallet in the future, open Terminal and run this command:
+
+~/Downloads/Bare/src/qt/bare-qt

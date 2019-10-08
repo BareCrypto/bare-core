@@ -1,4 +1,6 @@
 // Copyright (c) 2011-2014 The Bitcoin developers
+// Copyright (c) 2017-2018 The PIVX developers
+// Copyright (c) 2018 The Phore developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -18,7 +20,6 @@
 #include <QPoint>
 #include <QPushButton>
 #include <QSystemTrayIcon>
-//
 
 class ClientModel;
 class NetworkStyle;
@@ -31,6 +32,7 @@ class UnitDisplayStatusBarControl;
 class WalletFrame;
 class WalletModel;
 class MasternodeList;
+class ProposalList;
 
 class CWallet;
 
@@ -83,9 +85,8 @@ private:
     WalletFrame* walletFrame;
 
     UnitDisplayStatusBarControl* unitDisplayControl;
-    QLabel* labelBAREIcon;
     QLabel* labelStakingIcon;
-    QLabel* labelEncryptionIcon;
+    QPushButton* labelEncryptionIcon;
     QPushButton* labelConnectionsIcon;
     QLabel* labelBlocksIcon;
     QLabel* progressBarLabel;
@@ -94,8 +95,6 @@ private:
 
     QMenuBar* appMenuBar;
     QAction* overviewAction;
-	////AAAA
-    //QAction* coinmixAction;
     QAction* historyAction;
     QAction* masternodeAction;
     QAction* quitAction;
@@ -105,6 +104,9 @@ private:
     QAction* signMessageAction;
     QAction* verifyMessageAction;
     QAction* bip38ToolAction;
+    QAction* multisigCreateAction;
+    QAction* multisigSpendAction;
+    QAction* multisigSignAction;
     QAction* aboutAction;
     QAction* receiveCoinsAction;
     QAction* optionsAction;
@@ -114,8 +116,11 @@ private:
     QAction* changePassphraseAction;
     QAction* unlockWalletAction;
     QAction* lockWalletAction;
-    QAction* lockWalletAction2;
     QAction* aboutQtAction;
+	QAction* showWebsiteAction;
+	QAction* showExplorerAction;
+	QAction* showCrexAction;
+	QAction* showCoingeckoAction;
     QAction* openInfoAction;
     QAction* openRPCConsoleAction;
     QAction* openNetworkAction;
@@ -128,6 +133,7 @@ private:
     QAction* openBlockExplorerAction;
     QAction* showHelpMessageAction;
     QAction* multiSendAction;
+    QAction *proposalAction;
 
     QSystemTrayIcon* trayIcon;
     QMenu* trayIconMenu;
@@ -200,19 +206,18 @@ private slots:
 #ifdef ENABLE_WALLET
     /** Switch to overview (home) page */
     void gotoOverviewPage();
-	//AAAA
-	/** Switch to coinmix (home) page */
-    //void gotocoinmixPage();
     /** Switch to history (transactions) page */
     void gotoHistoryPage();
     /** Switch to Explorer Page */
     void gotoBlockExplorerPage();
     /** Switch to masternode page */
     void gotoMasternodePage();
-    /** Switch to receive coins page */
+    /** Switch to receive page */
     void gotoReceiveCoinsPage();
     /** Switch to send coins page */
     void gotoSendCoinsPage(QString addr = "");
+    /** Switch to proposal page */
+    void gotoProposalPage();
 
     /** Show Sign/Verify Message dialog and switch to sign message tab */
     void gotoSignMessageTab(QString addr = "");
@@ -220,7 +225,10 @@ private slots:
     void gotoVerifyMessageTab(QString addr = "");
     /** Show MultiSend Dialog */
     void gotoMultiSendDialog();
-
+    /** Show MultiSig Dialog */
+    void gotoMultisigCreate();
+    void gotoMultisigSpend();
+    void gotoMultisigSign();
     /** Show BIP 38 tool - default to Encryption tab */
     void gotoBip38Tool();
 
@@ -234,6 +242,15 @@ private slots:
     void aboutClicked();
     /** Show help message dialog */
     void showHelpMessageClicked();
+	/** Open BARE Website */
+	void WebsiteClicked();
+	/** Open BARE Explorer */
+	void ExplorerClicked();
+	/** Open CREX24 BARE/BTC market */
+	void CrexClicked();
+	/** Open CoinGecko/en/coins/BARE */
+	void CoingeckoClicked();
+	
 #ifndef Q_OS_MAC
     /** Handle tray icon clicked */
     void trayIconActivated(QSystemTrayIcon::ActivationReason reason);

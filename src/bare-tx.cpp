@@ -1,4 +1,8 @@
 // Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2015-2017 The PIVX developers
+// Copyright (c) 2017-2018 The Phore developers
+// Copyright (c) 2018-2019 The Monetaryunit developers
+// Copyright (c) 2019 The Bare developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -7,12 +11,13 @@
 #include "coins.h"
 #include "core_io.h"
 #include "keystore.h"
+#include "main.h"
 #include "primitives/block.h" // for MAX_BLOCK_SIZE
 #include "primitives/transaction.h"
 #include "script/script.h"
 #include "script/sign.h"
 #include "ui_interface.h" // for _(...)
-#include "univalue/univalue.h"
+#include <univalue.h>
 #include "util.h"
 #include "utilmoneystr.h"
 #include "utilstrencodings.h"
@@ -48,8 +53,8 @@ static bool AppInitRawTx(int argc, char* argv[])
         // First part of help message is specific to this utility
         std::string strUsage = _("Bare Core bare-tx utility version") + " " + FormatFullVersion() + "\n\n" +
                                _("Usage:") + "\n" +
-                               "  bare-tx [options] <hex-tx> [commands]  " + _("Update hex-encoded Bare transaction") + "\n" +
-                               "  bare-tx [options] -create [commands]   " + _("Create hex-encoded Bare transaction") + "\n" +
+                               "  bare-tx [options] <hex-tx> [commands]  " + _("Update hex-encoded bare transaction") + "\n" +
+                               "  bare-tx [options] -create [commands]   " + _("Create hex-encoded bare transaction") + "\n" +
                                "\n";
 
         fprintf(stdout, "%s", strUsage.c_str());
@@ -190,7 +195,7 @@ static void MutateTxAddInput(CMutableTransaction& tx, const string& strInput)
     uint256 txid(strTxid);
 
     static const unsigned int minTxOutSz = 9;
-    static const unsigned int maxVout = MAX_BLOCK_SIZE / minTxOutSz;
+    static const unsigned int maxVout = MAX_BLOCK_SIZE_LEGACY / minTxOutSz;
 
     // extract and validate vout
     string strVout = strInput.substr(pos + 1, string::npos);
@@ -220,12 +225,11 @@ static void MutateTxAddOutAddr(CMutableTransaction& tx, const string& strInput)
 
     // extract and validate ADDRESS
     string strAddr = strInput.substr(pos + 1, string::npos);
-    CBitcoinAddress addr(strAddr);
-    if (!addr.IsValid())
+    if (!IsValidDestinationString(strAddr))
         throw runtime_error("invalid TX output address");
 
     // build standard output script via GetScriptForDestination()
-    CScript scriptPubKey = GetScriptForDestination(addr.Get());
+    CScript scriptPubKey = GetScriptForDestination(DecodeDestination(strAddr));
 
     // construct TxOut, append to transaction output list
     CTxOut txout(value, scriptPubKey);
@@ -324,6 +328,16 @@ vector<unsigned char> ParseHexUO(map<string, UniValue>& o, string strKey)
     return ParseHexUV(o[strKey], strKey);
 }
 
+static CAmount AmountFromValue(const UniValue& value)
+{
+    if (!value.isNum() && !value.isStr())
+        throw runtime_error("Amount is not a number or string");
+    CAmount amount;
+    if (!ParseFixedPoint(value.getValStr(), 8, &amount))
+        throw runtime_error("Invalid amount");
+    return amount;
+}
+
 static void MutateTxSign(CMutableTransaction& tx, const string& flagStr)
 {
     int nHashType = SIGHASH_ALL;
@@ -349,7 +363,7 @@ static void MutateTxSign(CMutableTransaction& tx, const string& flagStr)
     UniValue keysObj = registers["privatekeys"];
     fGivenKeys = true;
 
-    for (unsigned int kidx = 0; kidx < keysObj.count(); kidx++) {
+    for (unsigned int kidx = 0; kidx < keysObj.size(); kidx++) {
         if (!keysObj[kidx].isStr())
             throw runtime_error("privatekey not a string");
         CBitcoinSecret vchSecret;
@@ -366,7 +380,7 @@ static void MutateTxSign(CMutableTransaction& tx, const string& flagStr)
         throw runtime_error("prevtxs register variable must be set.");
     UniValue prevtxsObj = registers["prevtxs"];
     {
-        for (unsigned int previdx = 0; previdx < prevtxsObj.count(); previdx++) {
+        for (unsigned int previdx = 0; previdx < prevtxsObj.size(); previdx++) {
             UniValue prevOut = prevtxsObj[previdx];
             if (!prevOut.isObject())
                 throw runtime_error("expected prevtxs internal object");
@@ -395,12 +409,15 @@ static void MutateTxSign(CMutableTransaction& tx, const string& flagStr)
                 if ((unsigned int)nOut >= coins->vout.size())
                     coins->vout.resize(nOut + 1);
                 coins->vout[nOut].scriptPubKey = scriptPubKey;
-                coins->vout[nOut].nValue = 0; // we don't know the actual output value
+                coins->vout[nOut].nValue = 0;
+                if (prevOut.exists("amount")) {
+                    coins->vout[nOut].nValue = AmountFromValue(prevOut["amount"]);
+                }
             }
 
             // if redeemScript given and private keys given,
             // add redeemScript to the tempKeystore so it can be signed:
-            if (fGivenKeys && scriptPubKey.IsPayToScriptHash() &&
+            if (fGivenKeys && (scriptPubKey.IsPayToScriptHash() || scriptPubKey.IsPayToWitnessScriptHash()) &&
                 prevOut.exists("redeemScript")) {
                 UniValue v = prevOut["redeemScript"];
                 vector<unsigned char> rsData(ParseHexUV(v, "redeemScript"));
@@ -423,17 +440,19 @@ static void MutateTxSign(CMutableTransaction& tx, const string& flagStr)
             continue;
         }
         const CScript& prevPubKey = coins->vout[txin.prevout.n].scriptPubKey;
+        const CAmount& amount = coins->vout[txin.prevout.n].nValue;
 
-        txin.scriptSig.clear();
+        SignatureData sigdata;
         // Only sign SIGHASH_SINGLE if there's a corresponding output:
         if (!fHashSingle || (i < mergedTx.vout.size()))
-            SignSignature(keystore, prevPubKey, mergedTx, i, nHashType);
+            ProduceSignature(MutableTransactionSignatureCreator(&keystore, &mergedTx, i, amount, nHashType), prevPubKey, sigdata);
 
         // ... and merge in other signatures:
-        BOOST_FOREACH (const CTransaction& txv, txVariants) {
-            txin.scriptSig = CombineSignatures(prevPubKey, mergedTx, i, txin.scriptSig, txv.vin[i].scriptSig);
-        }
-        if (!VerifyScript(txin.scriptSig, prevPubKey, STANDARD_SCRIPT_VERIFY_FLAGS, MutableTransactionSignatureChecker(&mergedTx, i)))
+        BOOST_FOREACH(const CTransaction& txv, txVariants)
+            sigdata = CombineSignatures(prevPubKey, MutableTransactionSignatureChecker(&mergedTx, i, amount), sigdata, DataFromTransaction(txv, i));
+        UpdateTransaction(mergedTx, i, sigdata);
+
+        if (!VerifyScript(txin.scriptSig, prevPubKey, mergedTx.wit.vtxinwit.size() > i ? &mergedTx.wit.vtxinwit[i].scriptWitness : NULL, STANDARD_SCRIPT_VERIFY_FLAGS, MutableTransactionSignatureChecker(&mergedTx, i, amount)))
             fComplete = false;
     }
 
@@ -495,7 +514,7 @@ static void OutputTxHash(const CTransaction& tx)
 
 static void OutputTxHex(const CTransaction& tx)
 {
-    string strHex = EncodeHexTx(tx);
+    string strHex = EncodeHexTx(tx, PROTOCOL_VERSION);
 
     fprintf(stdout, "%s\n", strHex.c_str());
 }
@@ -550,12 +569,12 @@ static int CommandLineRawTx(int argc, char* argv[])
             if (argc < 2)
                 throw runtime_error("too few parameters");
 
-            // param: hex-encoded Bare transaction
+            // param: hex-encoded bare transaction
             string strHexTx(argv[1]);
             if (strHexTx == "-") // "-" implies standard input
                 strHexTx = readStdin();
 
-            if (!DecodeHexTx(txDecodeTmp, strHexTx))
+            if (!DecodeHexTx(txDecodeTmp, strHexTx, true))
                 throw runtime_error("invalid transaction encoding");
 
             startArg = 2;

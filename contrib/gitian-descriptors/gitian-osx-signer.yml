@@ -1,13 +1,13 @@
 ---
 name: "bare-dmg-signer"
 suites:
-- "trusty"
+- "bionic"
 architectures:
 - "amd64"
 packages:
 - "faketime"
 remotes:
-- "url": "https://github.com/BareCrypto/bare-core/bare-sigs"
+- "url": "https://github.com/crypto-node/bare-core-detached-sigs.git"
   "dir": "signature"
 files:
 - "bare-osx-unsigned.tar.gz"

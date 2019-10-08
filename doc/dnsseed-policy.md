@@ -1,5 +1,5 @@
 Expectations for DNS Seed operators
-===================================
+====================================
 
 Bare Core attempts to minimize the level of trust in DNS seeds,
 but DNS seeds still pose a small amount of risk for the network.
@@ -46,12 +46,11 @@ related to the DNS seed operation.
 If these expectations cannot be satisfied the operator should
 discontinue providing services and contact the active Bare
 Core development team as well as posting on the
-[Bare Forum](https://google.forum.com/).
+[Bare Forum](https://forum.bare.org).
 
 Behavior outside of these expectations may be reasonable in some
 situations but should be discussed in public in advance.
 
 See also
---------
-
+----------
 - [bitcoin-seeder](https://github.com/sipa/bitcoin-seeder) is a reference implementation of a DNS seed.

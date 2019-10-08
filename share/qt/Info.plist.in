@@ -17,7 +17,7 @@
   <string>APPL</string>
 
   <key>CFBundleGetInfoString</key>
-  <string>@CLIENT_VERSION_MAJOR@.@CLIENT_VERSION_MINOR@.@CLIENT_VERSION_REVISION@, Copyright © 2009-@COPYRIGHT_YEAR@ The Bitcoin Core developers, 2014-@COPYRIGHT_YEAR@ The Dash and PIVX Core Developers, 2017-@COPYRIGHT_YEAR@ The ALQO Core developers, 2017-@COPYRIGHT_YEAR@ The Bare Core developers</string>
+  <string>@CLIENT_VERSION_MAJOR@.@CLIENT_VERSION_MINOR@.@CLIENT_VERSION_REVISION@, Copyright © 2009-@COPYRIGHT_YEAR@ The Bitcoin Core developers, 2014-@COPYRIGHT_YEAR@ The Dash Core developers, 2015-@COPYRIGHT_YEAR@ The PIVX Core developers, 2017-@COPYRIGHT_YEAR@ The Phore Developers, 2018-@COPYRIGHT_YEAR@ The MonetaryUnit Developers, 2019-@COPYRIGHT_YEAR@ The Bare Developers</string>
 
   <key>CFBundleShortVersionString</key>
   <string>@CLIENT_VERSION_MAJOR@.@CLIENT_VERSION_MINOR@.@CLIENT_VERSION_REVISION@</string>
@@ -31,8 +31,14 @@
   <key>CFBundleExecutable</key>
   <string>Bare-Qt</string>
 
+  <key>CFBundleName</key>
+  <string>Bare-Qt</string>
+
+  <key>LSHasLocalizedDisplayName</key>
+  <true/>
+
   <key>CFBundleIdentifier</key>
-  <string>org.barecoin.Bare-Qt</string>
+  <string>io.bare.Bare-Qt</string>
 
   <key>CFBundleURLTypes</key>
   <array>
@@ -40,7 +46,7 @@
       <key>CFBundleTypeRole</key>
       <string>Editor</string>
       <key>CFBundleURLName</key>
-      <string>org.barecoin.BarePayment</string>
+      <string>io.bare.BarePayment</string>
       <key>CFBundleURLSchemes</key>
       <array>
         <string>bare</string>
@@ -52,7 +58,7 @@
   <array>
     <dict>
       <key>UTTypeIdentifier</key>
-      <string>org.barecoin.paymentrequest</string>
+      <string>io.bare.paymentrequest</string>
       <key>UTTypeDescription</key>
       <string>Bare payment request</string>
       <key>UTTypeConformsTo</key>
@@ -78,7 +84,7 @@
       <string>Editor</string>
       <key>LSItemContentTypes</key>
       <array>
-        <string>org.barecoin.paymentrequest</string>
+        <string>io.bare.paymentrequest</string>
       </array>
       <key>LSHandlerRank</key>
       <string>Owner</string>

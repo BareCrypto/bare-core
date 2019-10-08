@@ -1,7 +1,7 @@
 // Copyright (c) 2011-2013 The Bitcoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-//
+
 #include "walletframe.h"
 
 #include "bitcoingui.h"
@@ -111,15 +111,6 @@ void WalletFrame::gotoOverviewPage()
         i.value()->gotoOverviewPage();
 }
 
-// AAAA
-
-void WalletFrame::gotocoinmixPage()
-{
-    QMap<QString, WalletView*>::const_iterator i;
-    for (i = mapWalletViews.constBegin(); i != mapWalletViews.constEnd(); ++i)
-        i.value()->gotocoinmixPage();
-}
-
 void WalletFrame::gotoHistoryPage()
 {
     QMap<QString, WalletView*>::const_iterator i;
@@ -155,6 +146,13 @@ void WalletFrame::gotoSendCoinsPage(QString addr)
         i.value()->gotoSendCoinsPage(addr);
 }
 
+void WalletFrame::gotoProposalPage()
+{
+    QMap<QString, WalletView*>::const_iterator i;
+    for (i = mapWalletViews.constBegin(); i != mapWalletViews.constEnd(); ++i)
+        i.value()->gotoProposalPage();
+}
+
 void WalletFrame::gotoSignMessageTab(QString addr)
 {
     WalletView* walletView = currentWalletView();
@@ -184,6 +182,13 @@ void WalletFrame::gotoMultiSendDialog()
         walletView->gotoMultiSendDialog();
 }
 
+void WalletFrame::gotoMultisigDialog(int index)
+{
+    WalletView* walletView = currentWalletView();
+    if(walletView){
+        walletView->gotoMultisigDialog(index);
+    }
+}
 
 void WalletFrame::encryptWallet(bool status)
 {
@@ -218,6 +223,13 @@ void WalletFrame::lockWallet()
     WalletView* walletView = currentWalletView();
     if (walletView)
         walletView->lockWallet();
+}
+
+void WalletFrame::toggleLockWallet()
+{
+    WalletView* walletView = currentWalletView();
+    if (walletView)
+        walletView->toggleLockWallet();
 }
 
 void WalletFrame::usedSendingAddresses()

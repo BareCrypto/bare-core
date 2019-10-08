@@ -1,24 +1,30 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2017 The PIVX developers 
-// Copyright (c) 2015-2017 The ALQO developers
-// Copyright (c) 2017-2019 The Bare developers
+// Copyright (c) 2015-2017 The PIVX developers
+// Copyright (c) 2017-2018 The Phore developers
+// Copyright (c) 2018-2019 The Monetaryunit developers
+// Copyright (c) 2019 The Bare developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "clientversion.h"
 #include "init.h"
 #include "main.h"
-#include "masternodeconfig.h"
 #include "noui.h"
+#include "scheduler.h"
 #include "rpcserver.h"
 #include "ui_interface.h"
 #include "util.h"
+#include "httpserver.h"
+#include "httprpc.h"
+#include "rpcserver.h"
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/thread.hpp>
+
+#include <stdio.h>
 
 /* Introduction text for doxygen: */
 
@@ -26,7 +32,7 @@
  *
  * \section intro_sec Introduction
  *
- * This is the developer documentation of the reference client for an experimental new digital currency called Bare (http://www.barecoin.org),
+ * This is the developer documentation of the reference client for an experimental new digital currency called Bare (http://www.bare.io),
  * which enables instant payments to anyone, anywhere in the world. Bare uses peer-to-peer technology to operate
  * with no central authority: managing transactions and issuing money are carried out collectively by the network.
  *
@@ -38,7 +44,7 @@
 
 static bool fDaemon;
 
-void DetectShutdownThread(boost::thread_group* threadGroup)
+void WaitForShutdown(boost::thread_group* threadGroup)
 {
     bool fShutdown = ShutdownRequested();
     // Tell the main threads to shutdown.
@@ -47,7 +53,7 @@ void DetectShutdownThread(boost::thread_group* threadGroup)
         fShutdown = ShutdownRequested();
     }
     if (threadGroup) {
-        threadGroup->interrupt_all();
+        Interrupt(*threadGroup);
         threadGroup->join_all();
     }
 }
@@ -59,7 +65,7 @@ void DetectShutdownThread(boost::thread_group* threadGroup)
 bool AppInit(int argc, char* argv[])
 {
     boost::thread_group threadGroup;
-    boost::thread* detectShutdownThread = NULL;
+    CScheduler scheduler;
 
     bool fRet = false;
 
@@ -87,7 +93,7 @@ bool AppInit(int argc, char* argv[])
     }
 
     try {
-        if (!boost::filesystem::is_directory(GetDataDir())) {
+        if (!boost::filesystem::is_directory(GetDataDir(false))) {
             fprintf(stderr, "Error: Specified data directory \"%s\" does not exist.\n", mapArgs["-datadir"].c_str());
             return false;
         }
@@ -100,13 +106,6 @@ bool AppInit(int argc, char* argv[])
         // Check for -testnet or -regtest parameter (Params() calls are only valid after this clause)
         if (!SelectParamsFromCommandLine()) {
             fprintf(stderr, "Error: Invalid combination of -regtest and -testnet.\n");
-            return false;
-        }
-
-        // parse masternode.conf
-        std::string strErr;
-        if (!masternodeConfig.read(strErr)) {
-            fprintf(stderr, "Error reading masternode configuration file: %s\n", strErr.c_str());
             return false;
         }
 
@@ -144,8 +143,7 @@ bool AppInit(int argc, char* argv[])
 #endif
         SoftSetBoolArg("-server", true);
 
-        detectShutdownThread = new boost::thread(boost::bind(&DetectShutdownThread, &threadGroup));
-        fRet = AppInit2(threadGroup);
+        fRet = AppInit2(threadGroup, scheduler);
     } catch (std::exception& e) {
         PrintExceptionContinue(&e, "AppInit()");
     } catch (...) {
@@ -153,19 +151,12 @@ bool AppInit(int argc, char* argv[])
     }
 
     if (!fRet) {
-        if (detectShutdownThread)
-            detectShutdownThread->interrupt();
-
-        threadGroup.interrupt_all();
+        Interrupt(threadGroup);
         // threadGroup.join_all(); was left out intentionally here, because we didn't re-test all of
         // the startup-failure cases to make sure they don't result in a hang due to some
         // thread-blocking-waiting-for-another-thread-during-startup case
-    }
-
-    if (detectShutdownThread) {
-        detectShutdownThread->join();
-        delete detectShutdownThread;
-        detectShutdownThread = NULL;
+    } else {
+        WaitForShutdown(&threadGroup);
     }
     Shutdown();
 

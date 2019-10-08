@@ -53,7 +53,7 @@ private:
     Qt::SortOrder order;
 };
 
-/** Model for list of recently generated payment requests / BARE:URIs.
+/** Model for list of recently generated payment requests / bare: URIs.
  * Part of wallet model.
  */
 class RecentRequestsTableModel : public QAbstractTableModel

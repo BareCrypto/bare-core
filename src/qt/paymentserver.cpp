@@ -1,8 +1,7 @@
 // Copyright (c) 2011-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2017 The PIVX developers 
-// Copyright (c) 2015-2017 The ALQO developers
-// Copyright (c) 2017-2019 The Bare developers
+// Copyright (c) 2015-2017 The PIVX developers
+// Copyright (c) 2017 The Phore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -91,7 +90,9 @@ static QString ipcServerName()
     QString name("BareQt");
 
     // Append a simple hash of the datadir
-    QString ddir(QString::fromStdString(GetDataDir().string()));
+    // Note that GetDataDir(true) returns a different path
+    // for -testnet versus main net
+    QString ddir(QString::fromStdString(GetDataDir(true).string()));
     name.append(QString::number(qHash(ddir)));
 
     return name;
@@ -193,21 +194,19 @@ void PaymentServer::ipcParseCommandLine(int argc, char* argv[])
         if (arg.startsWith("-"))
             continue;
 
-        // If the BARE:URI contains a payment request, we are not able to detect the
+        // If the bare: URI contains a payment request, we are not able to detect the
         // network as that would require fetching and parsing the payment request.
         // That means clicking such an URI which contains a testnet payment request
         // will start a mainnet instance and throw a "wrong network" error.
-        if (arg.startsWith(BITCOIN_IPC_PREFIX, Qt::CaseInsensitive)) // BARE:URI
+        if (arg.startsWith(BITCOIN_IPC_PREFIX, Qt::CaseInsensitive)) // bare: URI
         {
             savedPaymentRequests.append(arg);
 
             SendCoinsRecipient r;
             if (GUIUtil::parseBitcoinURI(arg, &r) && !r.address.isEmpty()) {
-                CBitcoinAddress address(r.address.toStdString());
-
-                if (address.IsValid(Params(CBaseChainParams::MAIN))) {
+                if (IsValidDestinationString(r.address.toStdString(), Params(CBaseChainParams::MAIN))) {
                     SelectParams(CBaseChainParams::MAIN);
-                } else if (address.IsValid(Params(CBaseChainParams::TESTNET))) {
+                } else if (IsValidDestinationString(r.address.toStdString(), Params(CBaseChainParams::TESTNET))) {
                     SelectParams(CBaseChainParams::TESTNET);
                 }
             }
@@ -279,7 +278,7 @@ PaymentServer::PaymentServer(QObject* parent, bool startLocalServer) : QObject(p
     GOOGLE_PROTOBUF_VERIFY_VERSION;
 
     // Install global event filter to catch QFileOpenEvents
-    // on Mac: sent when you click BARE: links
+    // on Mac: sent when you click bare: links
     // other OSes: helpful when dealing with payment request files (in the future)
     if (parent)
         parent->installEventFilter(this);
@@ -309,12 +308,12 @@ PaymentServer::~PaymentServer()
 }
 
 //
-// OSX-specific way of handling BARE:URIs and
+// OSX-specific way of handling bare: URIs and
 // PaymentRequest mime types
 //
 bool PaymentServer::eventFilter(QObject* object, QEvent* event)
 {
-    // clicking on BARE:URIs creates FileOpen events on the Mac
+    // clicking on bare: URIs creates FileOpen events on the Mac
     if (event->type() == QEvent::FileOpen) {
         QFileOpenEvent* fileEvent = static_cast<QFileOpenEvent*>(event);
         if (!fileEvent->file().isEmpty())
@@ -335,7 +334,7 @@ void PaymentServer::initNetManager()
     if (netManager != NULL)
         delete netManager;
 
-    // netManager is used to fetch paymentrequests given in BARE:URIs
+    // netManager is used to fetch paymentrequests given in bare: URIs
     netManager = new QNetworkAccessManager(this);
 
     QNetworkProxy proxy;
@@ -372,7 +371,7 @@ void PaymentServer::handleURIOrFile(const QString& s)
         return;
     }
 
-    if (s.startsWith(BITCOIN_IPC_PREFIX, Qt::CaseInsensitive)) // BARE:URI
+    if (s.startsWith(BITCOIN_IPC_PREFIX, Qt::CaseInsensitive)) // bare: URI
     {
 #if QT_VERSION < 0x050000
         QUrl uri(s);
@@ -401,8 +400,7 @@ void PaymentServer::handleURIOrFile(const QString& s)
         {
             SendCoinsRecipient recipient;
             if (GUIUtil::parseBitcoinURI(s, &recipient)) {
-                CBitcoinAddress address(recipient.address.toStdString());
-                if (!address.IsValid()) {
+                if (!IsValidDestinationString(recipient.address.toStdString())) {
                     emit message(tr("URI handling"), tr("Invalid payment address %1").arg(recipient.address),
                         CClientUIInterface::MSG_ERROR);
                 } else
@@ -522,9 +520,9 @@ bool PaymentServer::processPaymentRequest(PaymentRequestPlus& request, SendCoins
         CTxDestination dest;
         if (ExtractDestination(sendingTo.first, dest)) {
             // Append destination address
-            addresses.append(QString::fromStdString(CBitcoinAddress(dest).ToString()));
+            addresses.append(QString::fromStdString(EncodeDestination(dest)));
         } else if (!recipient.authenticatedMerchant.isEmpty()) {
-            // Insecure payments to custom Bare addresses are not supported
+            // Insecure payments to custom bare addresses are not supported
             // (there is no good way to tell the user where they are paying in a way
             // they'd have a chance of understanding).
             emit message(tr("Payment request rejected"),
@@ -586,25 +584,24 @@ void PaymentServer::fetchPaymentACK(CWallet* wallet, SendCoinsRecipient recipien
     // Create a new refund address, or re-use:
     QString account = tr("Refund from %1").arg(recipient.authenticatedMerchant);
     std::string strAccount = account.toStdString();
-    set<CTxDestination> refundAddresses = wallet->GetAccountAddresses(strAccount);
-    if (!refundAddresses.empty()) {
-        CScript s = GetScriptForDestination(*refundAddresses.begin());
+    CPubKey newKey;
+    if (wallet->GetKeyFromPool(newKey)) {
+        // BIP70 requests encode the scriptPubKey directly, so we are not restricted to address
+        // types supported by the receiver. As a result, we choose the address format we also
+        // use for change. Despite an actual payment and not change, this is a close match:
+        // it's the output type we use subject to privacy issues, but not restricted by what
+        // other software supports.
+        wallet->LearnRelatedScripts(newKey, g_change_type);
+        CTxDestination dest = GetDestinationForKey(newKey, g_change_type);
+        wallet->SetAddressBook(dest, strAccount, "refund");
+
+        CScript s = GetScriptForDestination(dest);
         payments::Output* refund_to = payment.add_refund_to();
         refund_to->set_script(&s[0], s.size());
     } else {
-        CPubKey newKey;
-        if (wallet->GetKeyFromPool(newKey)) {
-            CKeyID keyID = newKey.GetID();
-            wallet->SetAddressBook(keyID, strAccount, "refund");
-
-            CScript s = GetScriptForDestination(keyID);
-            payments::Output* refund_to = payment.add_refund_to();
-            refund_to->set_script(&s[0], s.size());
-        } else {
-            // This should never happen, because sending coins should have
-            // just unlocked the wallet and refilled the keypool.
-            qWarning() << "PaymentServer::fetchPaymentACK : Error getting refund key, refund_to not set";
-        }
+        // This should never happen, because sending coins should have
+        // just unlocked the wallet and refilled the keypool.
+        qWarning() << "PaymentServer::fetchPaymentACK: Error getting refund key, refund_to not set";
     }
 
     int length = payment.ByteSize();

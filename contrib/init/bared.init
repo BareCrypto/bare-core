@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#  bared The Bare Core server.
+#  bared The Bare core server.
 #
 #
 # chkconfig: 345 80 20
