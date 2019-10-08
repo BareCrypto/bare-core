@@ -1654,7 +1654,9 @@ int64_t GetBlockValue(int nHeight)
 		return 1.6 * COIN;
 	} else if (nHeight > 2070600) {
 		return 0.1 * COIN;
-    return 0;
+    }
+	
+	return 0;
 }
 
 int64_t GetMasternodePayment(int nHeight, int64_t blockValue, int nMasternodeCount)
