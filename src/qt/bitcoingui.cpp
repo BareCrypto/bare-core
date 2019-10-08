@@ -797,7 +797,7 @@ void BitcoinGUI::WebsiteClicked()
     QDesktopServices::openUrl(QUrl(link));
 }
 
-void BitcoinGUI::ExlorerClicked()
+void BitcoinGUI::ExplorerClicked()
 {
     QString link = "https://explorer.bare.network";
     QDesktopServices::openUrl(QUrl(link));
