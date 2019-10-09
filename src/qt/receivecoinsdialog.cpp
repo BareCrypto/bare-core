@@ -13,7 +13,6 @@
 #include "receiverequestdialog.h"
 #include "recentrequeststablemodel.h"
 #include "walletmodel.h"
-#include "wallet.h"
 
 #include <QAction>
 #include <QCursor>
@@ -34,15 +33,6 @@ ReceiveCoinsDialog::ReceiveCoinsDialog(QWidget* parent) : QDialog(parent),
     ui->showRequestButton->setIcon(QIcon());
     ui->removeRequestButton->setIcon(QIcon());
 #endif
-
-    // configure bech32 checkbox, disable if launched with legacy as default:
-    if (model->getDefaultAddressType() == OUTPUT_TYPE_BECH32) {
-        ui->useBech32->setCheckState(Qt::Checked);
-    } else {
-        ui->useBech32->setCheckState(Qt::Unchecked);
-    }
-
-    ui->useBech32->setVisible(model->getDefaultAddressType() != OUTPUT_TYPE_LEGACY);
 
     // context menu actions
     QAction* copyLabelAction = new QAction(tr("Copy label"), this);
@@ -145,11 +135,7 @@ void ReceiveCoinsDialog::on_receiveButton_clicked()
         }
     } else {
         /* Generate new receiving address */
-        OutputType address_type = model->getDefaultAddressType();
-        if (address_type != OUTPUT_TYPE_LEGACY) {
-            address_type = ui->useBech32->isChecked() ? OUTPUT_TYPE_BECH32 : OUTPUT_TYPE_DEFAULT;
-        }
-        address = model->getAddressTableModel()->addRow(AddressTableModel::Receive, label, "", address_type);        
+        address = model->getAddressTableModel()->addRow(AddressTableModel::Receive, label, "");
     }
     SendCoinsRecipient info(address, label,
         ui->reqAmount->value(), ui->reqMessage->text());

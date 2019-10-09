@@ -1247,7 +1247,7 @@ compress_big(sph_simd_big_context *sc, int last)
 			^ sph_dec32le_aligned(x + 4 * (i + 7));
 	}
 
-#define WBREAD(sb, o1, o2, mm)   do { \
+#define BAREEAD(sb, o1, o2, mm)   do { \
 		for (u = 0; u < 64; u += 8) { \
 			size_t v = wbp[(u >> 3) + (sb)]; \
 			w[u + 0] = INNER(q[v + 2 * 0 + (o1)], \
@@ -1269,16 +1269,16 @@ compress_big(sph_simd_big_context *sc, int last)
 		} \
 	} while (0)
 
-	WBREAD( 0,    0,    1, 185);
+	BAREEAD( 0,    0,    1, 185);
 	one_round_big(state, w, 0,  3, 23, 17, 27);
-	WBREAD( 8,    0,    1, 185);
+	BAREEAD( 8,    0,    1, 185);
 	one_round_big(state, w, 1, 28, 19, 22,  7);
-	WBREAD(16, -256, -128, 233);
+	BAREEAD(16, -256, -128, 233);
 	one_round_big(state, w, 2, 29,  9, 15,  5);
-	WBREAD(24, -383, -255, 233);
+	BAREEAD(24, -383, -255, 233);
 	one_round_big(state, w, 3,  4, 13, 10, 25);
 
-#undef WBREAD
+#undef BAREEAD
 
 	STEP_BIG(
 		sc->state[ 0], sc->state[ 1], sc->state[ 2], sc->state[ 3],

@@ -1,6 +1,8 @@
 // Copyright (c) 2011-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2017 The PIVX developers
+// Copyright (c) 2015-2017 The PIVX developers 
+// Copyright (c) 2015-2017 The ALQO developers
+// Copyright (c) 2017-2019 The Bare developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -18,7 +20,6 @@
 #include "main.h"
 #include "net.h"
 #include "txdb.h" // for -dbcache defaults
-#include "util.h"
 
 #ifdef ENABLE_WALLET
 #include "masternodeconfig.h"
@@ -69,19 +70,20 @@ void OptionsModel::Init()
         settings.setValue("strThirdPartyTxUrls", "");
     strThirdPartyTxUrls = settings.value("strThirdPartyTxUrls", "").toString();
 
-    if (!settings.contains("fHideZeroBalances"))
-        settings.setValue("fHideZeroBalances", true);
-    fHideZeroBalances = settings.value("fHideZeroBalances").toBool();
-
     if (!settings.contains("fCoinControlFeatures"))
         settings.setValue("fCoinControlFeatures", false);
     fCoinControlFeatures = settings.value("fCoinControlFeatures", false).toBool();
 
+    /* Removing Darksend - BJK
+    if (!settings.contains("nDarksendRounds"))
+        settings.setValue("nDarksendRounds", 2);
 
-    if (!settings.contains("nAnonymizeBareAmount"))
-        settings.setValue("nAnonymizeBareAmount", 1000);
+    if (!settings.contains("nAnonymizeAmount"))
+        settings.setValue("nAnonymizeAmount", 1000);
 
-    nAnonymizeBareAmount = settings.value("nAnonymizeBareAmount").toLongLong();
+    nDarksendRounds = settings.value("nDarksendRounds").toLongLong();
+    nAnonymizeAmount = settings.value("nAnonymizeAmount").toLongLong();
+    */
 
     if (!settings.contains("fShowMasternodesTab"))
         settings.setValue("fShowMasternodesTab", masternodeConfig.getCount());
@@ -108,13 +110,10 @@ void OptionsModel::Init()
 // Wallet
 #ifdef ENABLE_WALLET
     if (!settings.contains("bSpendZeroConfChange"))
-        settings.setValue("bSpendZeroConfChange", false);
+        settings.setValue("bSpendZeroConfChange", true);
     if (!SoftSetBoolArg("-spendzeroconfchange", settings.value("bSpendZeroConfChange").toBool()))
         addOverriddenOption("-spendzeroconfchange");
 #endif
-    if (!settings.contains("nStakeSplitThreshold"))
-        settings.setValue("nStakeSplitThreshold", 1);
-
 
     // Network
     if (!settings.contains("fUseUPnP"))
@@ -149,8 +148,12 @@ void OptionsModel::Init()
     if (!SoftSetArg("-lang", settings.value("language").toString().toStdString()))
         addOverriddenOption("-lang");
 
-    if (settings.contains("nAnonymizeBareAmount"))
-        SoftSetArg("-anonymizebareamount", settings.value("nAnonymizeBareAmount").toString().toStdString());
+    /* Removing Darksend - BJK
+    if (settings.contains("nDarksendRounds"))
+        SoftSetArg("-Darksendrounds", settings.value("nDarksendRounds").toString().toStdString());
+    if (settings.contains("nAnonymizeAmount"))
+        SoftSetArg("-anonymizeamount", settings.value("nAnonymizeAmount").toString().toStdString());
+    */
 
     language = settings.value("language").toString();
 }
@@ -212,12 +215,7 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
         case ShowMasternodesTab:
             return settings.value("fShowMasternodesTab");
 #endif
-        case StakeSplitThreshold:
-            if (pwalletMain)
-                return QVariant((int)pwalletMain->nStakeSplitThreshold);
-            return settings.value("nStakeSplitThreshold");
         case DisplayUnit:
-
             return nDisplayUnit;
         case ThirdPartyTxUrls:
             return strThirdPartyTxUrls;
@@ -233,10 +231,12 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
             return settings.value("nDatabaseCache");
         case ThreadsScriptVerif:
             return settings.value("nThreadsScriptVerif");
-        case HideZeroBalances:
-            return settings.value("fHideZeroBalances");
-        case AnonymizeBareAmount:
-            return QVariant(nAnonymizeBareAmount);
+        /* Removing Darksend - BJK
+        case DarksendRounds:
+            return QVariant(nDarksendRounds);
+        case AnonymizeAmount:
+            return QVariant(nAnonymizeAmount);
+        */
         case Listen:
             return settings.value("fListen");
         default:
@@ -312,10 +312,6 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
             }
             break;
 #endif
-        case StakeSplitThreshold:
-            settings.setValue("nStakeSplitThreshold", value.toInt());
-            setStakeSplitThreshold(value.toInt());
-            break;
         case DisplayUnit:
             setDisplayUnit(value);
             break;
@@ -344,17 +340,18 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
                 setRestartRequired(true);
             }
             break;
-        case HideZeroBalances:
-            fHideZeroBalances = value.toBool();
-            settings.setValue("fHideZeroBalances", fHideZeroBalances);
-            emit hideZeroBalancesChanged(fHideZeroBalances);
+        /* Removing Darksend - BJK
+        case DarksendRounds:
+            nDarksendRounds = value.toInt();
+            settings.setValue("nDarksendRounds", nDarksendRounds);
+            emit DarksendRoundsChanged(nDarksendRounds);
             break;
-
-        case AnonymizeBareAmount:
-            nAnonymizeBareAmount = value.toInt();
-            settings.setValue("nAnonymizeBareAmount", nAnonymizeBareAmount);
-            emit anonymizeBareAmountChanged(nAnonymizeBareAmount);
+        case AnonymizeAmount:
+            nAnonymizeAmount = value.toInt();
+            settings.setValue("nAnonymizeAmount", nAnonymizeAmount);
+            emit anonymizeAmountChanged(nAnonymizeAmount);
             break;
+        */
         case CoinControlFeatures:
             fCoinControlFeatures = value.toBool();
             settings.setValue("fCoinControlFeatures", fCoinControlFeatures);
@@ -399,25 +396,6 @@ void OptionsModel::setDisplayUnit(const QVariant& value)
     }
 }
 
-/* Update StakeSplitThreshold's value in wallet */
-void OptionsModel::setStakeSplitThreshold(int value)
-{
-    // XXX: maybe it's worth to wrap related stuff with WALLET_ENABLE ?
-    uint64_t nStakeSplitThreshold;
-
-    nStakeSplitThreshold = value;
-    if (pwalletMain && pwalletMain->nStakeSplitThreshold != nStakeSplitThreshold) {
-        CWalletDB walletdb(pwalletMain->strWalletFile);
-        LOCK(pwalletMain->cs_wallet);
-        {
-            pwalletMain->nStakeSplitThreshold = nStakeSplitThreshold;
-            if (pwalletMain->fFileBacked)
-                walletdb.WriteStakeSplitThreshold(nStakeSplitThreshold);
-        }
-    }
-}
-
-
 bool OptionsModel::getProxySettings(QNetworkProxy& proxy) const
 {
     // Directly query current base proxy, because
@@ -425,8 +403,8 @@ bool OptionsModel::getProxySettings(QNetworkProxy& proxy) const
     proxyType curProxy;
     if (GetProxy(NET_IPV4, curProxy)) {
         proxy.setType(QNetworkProxy::Socks5Proxy);
-        proxy.setHostName(QString::fromStdString(curProxy.proxy.ToStringIP()));
-        proxy.setPort(curProxy.proxy.GetPort());
+        proxy.setHostName(QString::fromStdString(curProxy.ToStringIP()));
+        proxy.setPort(curProxy.GetPort());
 
         return true;
     } else

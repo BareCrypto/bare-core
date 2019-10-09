@@ -1,12 +1,13 @@
 Bare Core
-=====================
+=========
 
 Setup
----------------------
-[Bare Core](http://bare.org/wallet) is the original Bare client and it builds the backbone of the network. However, it downloads and stores the entire history of Bare transactions; depending on the speed of your computer and network connection, the synchronization process can take anywhere from a few hours to a day or more. Thankfully you only have to do this once.
+-----
+
+[Bare Core]https://bare.network/ is the original Bare client and it builds the backbone of the network. However, it downloads and stores the entire history of Bare transactions; depending on the speed of your computer and network connection, the synchronization process can take anywhere from a few hours to a day or more. Thankfully you only have to do this once.
 
 Running
----------------------
+-------
 The following are some helpful notes on how to run Bare on your native platform.
 
 ### Unix
@@ -28,12 +29,12 @@ Drag Bare-Qt to your applications folder, and then run Bare-Qt.
 
 * See the documentation at the [Bare Wiki](https://en.bitcoin.it/wiki/Main_Page) ***TODO***
 for help and more information.
-* Ask for help on [BitcoinTalk](https://bitcointalk.org/index.php?topic=1262920.0) or on the [Bare Forum](http://forum.bare.org/).
-* Join one of our Slack groups [Bare Slack Groups](https://bare.org/slack-logins/).
-* Join our Discord server [Discord Server](https://discord.gg/dTRhamf)
+* Ask for help on [BitcoinTalk](https://bitcointalk.org/index.php?topic=5149503).
+* Join our Discord server [Bare Discord](https://discord.gg/HqHutDk).
 
 Building
----------------------
+--------
+
 The following are developer notes on how to build Bare on your native platform. They are not complete guides, but include notes on the necessary libraries, compile flags, etc.
 
 - [OSX Build Notes](build-osx.md)
@@ -41,8 +42,9 @@ The following are developer notes on how to build Bare on your native platform. 
 - [Gitian Building Guide](gitian-building.md)
 
 Development
----------------------
-The Bare repo's [root README](https://github.com/crypto-node/blob/master/README.md) contains relevant information on the development process and automated testing.
+-----------
+
+The Bare repo's [root README](https://github.com/BareCrypto/bare-core/bare-core/blob/master/README.md) contains relevant information on the development process and automated testing.
 
 - [Developer Notes](developer-notes.md)
 - [Multiwallet Qt Development](multiwallet-qt.md)
@@ -56,17 +58,19 @@ The Bare repo's [root README](https://github.com/crypto-node/blob/master/README.
 
 ### Resources
 
-* Discuss on the [BitcoinTalk](https://bitcointalk.org/index.php?topic=1262920.0) or the [Bare](http://forum.bare.org/) forum.
-* Join the [Bare-Dev](https://bare-dev.slack.com/) Slack group ([Sign-Up](https://bare-dev.herokuapp.com/)).
+* Discuss on the [BitcoinTalk](https://bitcointalk.org/index.php?topic=5149503).
+* Join the [Bare Discord](https://discord.gg/HqHutDk) 
 
 ### Miscellaneous
+
 - [Assets Attribution](assets-attribution.md)
 - [Files](files.md)
 - [Tor Support](tor.md)
 - [Init Scripts (systemd/upstart/openrc)](init.md)
 
 License
----------------------
+-------
+
 Distributed under the [MIT/X11 software license](http://www.opensource.org/licenses/mit-license.php).
 This product includes software developed by the OpenSSL Project for use in the [OpenSSL Toolkit](https://www.openssl.org/). This product includes
 cryptographic software written by Eric Young ([eay@cryptsoft.com](mailto:eay@cryptsoft.com)), and UPnP software written by Thomas Bernard.

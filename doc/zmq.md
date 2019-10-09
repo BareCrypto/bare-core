@@ -69,7 +69,7 @@ address. The same address can be used in more than one notification.
 For instance:
 
     $ bared -zmqpubhashtx=tcp://127.0.0.1:28332 \
-               -zmqpubrawtx=ipc:///tmp/bared.tx.raw
+            -zmqpubrawtx=ipc:///tmp/bared.tx.raw
 
 Each PUB notification has a topic and body, where the header
 corresponds to the notification type. For instance, for the
@@ -104,5 +104,5 @@ retrieve the chain from the last known block to the new tip.
 
 There are several possibilities that ZMQ notification can get lost
 during transmission depending on the communication type your are
-using. Bared appends an up-counting sequence number to each
+using. bared appends an up-counting sequence number to each
 notification which allows listeners to detect lost notifications.

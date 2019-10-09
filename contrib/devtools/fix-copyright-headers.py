@@ -49,5 +49,3 @@ for extension in extensions:
         print n,"Last Git Modified: ", modifiedTime, " - ", filePath
         os.popen(command % (last_year,year,filePath))
         n = n + 1
-
-

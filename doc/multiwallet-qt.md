@@ -16,6 +16,7 @@ Finally, two new headers and source files will have to be added to bitcoin-qt.pr
 
 Changes to class BitcoinGUI
 ---------------------------
+
 The principal change to the BitcoinGUI class concerns the QStackedWidget instance called centralWidget.
 This widget owns five page views: overviewPage, transactionsPage, addressBookPage, receiveCoinsPage, and sendCoinsPage.
 
@@ -31,7 +32,8 @@ refinements of the wallet controls with minimal need for further modifications t
 merges while reducing the risk of breaking top-level stuff.
 
 Changes to bare.cpp
-----------------------
+-------------------
+
 bare.cpp is the entry point into bare-qt, and as such, will require some minor modifications to provide hooks for
 multiple wallet support. Most importantly will be the way it instantiates WalletModels and passes them to the
 singleton BitcoinGUI instance called window. Formerly, BitcoinGUI kept a pointer to a single instance of a WalletModel.

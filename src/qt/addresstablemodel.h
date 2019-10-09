@@ -10,7 +10,6 @@
 
 class AddressTablePriv;
 class WalletModel;
-enum OutputType : int;
 
 class CWallet;
 
@@ -62,7 +61,7 @@ public:
     /* Add an address to the model.
        Returns the added address on success, and an empty string otherwise.
      */
-    QString addRow(const QString& type, const QString& label, const QString& address, const OutputType address_type);
+    QString addRow(const QString& type, const QString& label, const QString& address);
 
     /* Look up label for address in address book, if not found return empty string.
      */
@@ -89,7 +88,7 @@ public slots:
     /* Update address list from core.
      */
     void updateEntry(const QString& address, const QString& label, bool isMine, const QString& purpose, int status);
-    void updateEntry(const QString &pubCoin, const QString &isUsed, int status);
+
     friend class AddressTablePriv;
 };
 

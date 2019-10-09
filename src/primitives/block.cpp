@@ -1,7 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2012-2013 The PPCoin developers
-// Copyright (c) 2015-2017 The PIVX developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -16,10 +14,7 @@
 
 uint256 CBlockHeader::GetHash() const
 {
-    if(nVersion < 4)
-        return Hash(BEGIN(nVersion), END(nNonce));
-
-    return Hash(BEGIN(nVersion), END(nNonce));
+    return HashQuark(BEGIN(nVersion), END(nNonce));
 }
 
 uint256 CBlock::BuildMerkleTree(bool* fMutated) const
@@ -104,7 +99,7 @@ std::vector<uint256> CBlock::GetMerkleBranch(int nIndex) const
 uint256 CBlock::CheckMerkleBranch(uint256 hash, const std::vector<uint256>& vMerkleBranch, int nIndex)
 {
     if (nIndex == -1)
-        return uint256();
+		return uint256();
     for (std::vector<uint256>::const_iterator it(vMerkleBranch.begin()); it != vMerkleBranch.end(); ++it)
     {
         if (nIndex & 1)
@@ -192,6 +187,7 @@ bool CBlock::SignBlock(const CKeyStore& keystore)
             if (!keystore.GetKey(keyID, key))
                 return false;
 
+            //vector<unsigned char> vchSig;
             if (!key.Sign(GetHash(), vchBlockSig))
                  return false;
 
@@ -206,28 +202,12 @@ bool CBlock::SignBlock(const CKeyStore& keystore)
             if (!keystore.GetKey(keyID, key))
                 return false;
 
+            //vector<unsigned char> vchSig;
             if (!key.Sign(GetHash(), vchBlockSig))
                  return false;
 
             return true;
         }
-        else if(whichType == TX_WITNESS_V0_KEYHASH)
-        {
-            CKeyID keyID;
-            keyID = CKeyID(uint160(vSolutions[0]));
-
-            CKey key;
-            if (!keystore.GetKey(keyID, key)) {
-                return false;
-            }
-
-            if (!key.SignCompact(GetHash(), vchBlockSig)) {
-                 return false;
-            }
-
-            return true;
-        }
-        LogPrintf("SignBlock: unknow kernel type: %d \n", whichType);
     }
 
     LogPrintf("Sign failed\n");
@@ -273,42 +253,9 @@ bool CBlock::CheckBlockSignature() const
             return false;
 
         return pubkey.Verify(GetHash(), vchBlockSig);
-    }
-    else if(whichType == TX_WITNESS_V0_KEYHASH)
-    {
-        CPubKey pubkey;
-        if (vchBlockSig.empty()) {
-            return false;
-        }
-
-        if(! pubkey.RecoverCompact(GetHash(), vchBlockSig)) {
-            return false;
-        }
-
-        if (!pubkey.IsValid()) {
-            return false;
-        }
-
-        if(vtx.size() > 1 && vtx[1].wit.vtxinwit.size() > 0 && vtx[1].wit.vtxinwit[0].scriptWitness.stack.size() > 1) {
-            CPubKey pkey(vtx[1].wit.vtxinwit[0].scriptWitness.stack[1]);
-            if(pubkey != pkey) {
-                return false;
-            }
-        }
-
-        return true;
 
     }
 
     return false;
 }
 
-
-int64_t GetBlockCost(const CBlock& block)
-{
-    // This implements the cost = (stripped_size * 4) + witness_size formula,
-    // using only serialization with and without witness data. As witness_size
-    // is equal to total_size - stripped_size, this formula is identical to:
-    // cost = (stripped_size * 3) + total_size.
-    return ::GetSerializeSize(block, SER_NETWORK, PROTOCOL_VERSION | SERIALIZE_TRANSACTION_NO_WITNESS) * (WITNESS_SCALE_FACTOR - 1) + ::GetSerializeSize(block, SER_NETWORK, PROTOCOL_VERSION);
-}

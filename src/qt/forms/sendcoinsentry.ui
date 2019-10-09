@@ -154,7 +154,7 @@
     <item row="3" column="1">
      <widget class="QLabel" name="messageTextLabel">
       <property name="toolTip">
-       <string>A message that was attached to the Bare: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Bare network.</string>
+       <string>A message that was attached to the BARE:URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Bare network.</string>
       </property>
       <property name="textFormat">
        <enum>Qt::PlainText</enum>

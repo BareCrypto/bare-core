@@ -1,7 +1,7 @@
 // Copyright (c) 2011-2013 The Bitcoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
+//
 #ifndef BITCOIN_QT_WALLETFRAME_H
 #define BITCOIN_QT_WALLETFRAME_H
 
@@ -52,6 +52,10 @@ private:
 public slots:
     /** Switch to overview (home) page */
     void gotoOverviewPage();
+	
+	////AAAA
+	  /** Switch to overview (home) page */
+    void gotocoinmixPage();
     /** Switch to history (transactions) page */
     void gotoHistoryPage();
     /** Switch to masternode page */
@@ -62,16 +66,13 @@ public slots:
     void gotoSendCoinsPage(QString addr = "");
     /** Switch to explorer page */
     void gotoBlockExplorerPage();
-    /** Switch to proposal page */
-    void gotoProposalPage();
     /** Show Sign/Verify Message dialog and switch to sign message tab */
     void gotoSignMessageTab(QString addr = "");
     /** Show Sign/Verify Message dialog and switch to verify message tab */
     void gotoVerifyMessageTab(QString addr = "");
     /** Show MultiSend Dialog **/
     void gotoMultiSendDialog();
-    /** show a multisig tab **/
-    void gotoMultisigDialog(int index);
+
     /** Show BIP 38 tool - default to Encryption tab */
     void gotoBip38Tool();
 
@@ -85,8 +86,6 @@ public slots:
     void unlockWallet();
     /** Lock wallet */
     void lockWallet();
-    /** Toggle Wallet Lock State */
-    void toggleLockWallet();
 
     /** Show used sending addresses */
     void usedSendingAddresses();

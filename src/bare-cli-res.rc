@@ -17,13 +17,13 @@ BEGIN
         BLOCK "040904E4" // U.S. English - multilingual (hex)
         BEGIN
             VALUE "CompanyName",        "Bare"
-            VALUE "FileDescription",    "Bare-cli (OSS RPC client for Bare)"
+            VALUE "FileDescription",    "bare-cli (OSS RPC client for Bare)"
             VALUE "FileVersion",        VER_FILEVERSION_STR
             VALUE "InternalName",       "bare-cli"
             VALUE "LegalCopyright",     COPYRIGHT_STR
             VALUE "LegalTrademarks1",   "Distributed under the MIT/X11 software license, see the accompanying file COPYING or http://www.opensource.org/licenses/mit-license.php."
             VALUE "OriginalFilename",   "bare-cli.exe"
-            VALUE "ProductName",        "Bare-cli"
+            VALUE "ProductName",        "bare-cli"
             VALUE "ProductVersion",     VER_PRODUCTVERSION_STR
         END
     END

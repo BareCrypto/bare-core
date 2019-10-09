@@ -181,7 +181,7 @@
       <string>Asks</string>
      </property>
     </widget>
-    <widget class="QLabel" name="BARESupply">
+    <widget class="QLabel" name="BareSupply">
      <property name="geometry">
       <rect>
        <x>540</x>
@@ -197,7 +197,7 @@
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
      </property>
     </widget>
-    <widget class="QLabel" name="BAREDemand">
+    <widget class="QLabel" name="BareDemand">
      <property name="geometry">
       <rect>
        <x>160</x>
@@ -432,7 +432,7 @@
     <attribute name="title">
      <string>Buy</string>
     </attribute>
-    <widget class="QPushButton" name="BuyBARE">
+    <widget class="QPushButton" name="BuyBare">
      <property name="geometry">
       <rect>
        <x>30</x>
@@ -442,7 +442,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Buy BARE</string>
+      <string>Buy Bare</string>
      </property>
      <property name="icon">
       <iconset resource="../bare.qrc">
@@ -512,7 +512,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>BARE</string>
+      <string>Bare</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_5">
@@ -1704,10 +1704,10 @@
       </rect>
      </property>
      <property name="text">
-      <string>BARE</string>
+      <string>Bare</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="UnitsInputBARE">
+    <widget class="QLineEdit" name="UnitsInputBare">
      <property name="geometry">
       <rect>
        <x>310</x>
@@ -1741,7 +1741,7 @@
       </font>
      </property>
     </widget>
-    <widget class="QPushButton" name="SellBAREBTN">
+    <widget class="QPushButton" name="SellBareBTN">
      <property name="geometry">
       <rect>
        <x>30</x>
@@ -1751,7 +1751,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Sell BARE</string>
+      <string>Sell Bare</string>
      </property>
      <property name="icon">
       <iconset resource="../bare">
@@ -1777,12 +1777,12 @@
          </font>
         </property>
         <property name="text">
-         <string>BARE Available:</string>
+         <string>Bare Available:</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="BAREAvailableLabel">
+       <widget class="QLabel" name="BareAvailableLabel">
         <property name="palette">
          <palette>
           <active>
@@ -2213,7 +2213,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="labelBARE">
+       <widget class="QLabel" name="labelBare">
         <property name="font">
          <font>
           <weight>75</weight>
@@ -2221,7 +2221,7 @@
          </font>
         </property>
         <property name="text">
-         <string>BARE</string>
+         <string>Bare</string>
         </property>
        </widget>
       </item>
@@ -2733,7 +2733,7 @@
       <string>TextLabel</string>
      </property>
     </widget>
-    <widget class="QLabel" name="BAREBalanceLabel">
+    <widget class="QLabel" name="BareBalanceLabel">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -2762,7 +2762,7 @@
       </font>
      </property>
      <property name="text">
-      <string>BARE Balance:</string>
+      <string>Bare Balance:</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_12">
@@ -2784,7 +2784,7 @@
       <string>BTC Balance:</string>
      </property>
     </widget>
-    <widget class="QLabel" name="BAREAvailableLabel_2">
+    <widget class="QLabel" name="BareAvailableLabel_2">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -2813,7 +2813,7 @@
       </font>
      </property>
      <property name="text">
-      <string>BARE Available:</string>
+      <string>Bare Available:</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_14">
@@ -2832,10 +2832,10 @@
       </font>
      </property>
      <property name="text">
-      <string>BARE Pending:</string>
+      <string>Bare Pending:</string>
      </property>
     </widget>
-    <widget class="QLabel" name="BAREPendingLabel">
+    <widget class="QLabel" name="BarePendingLabel">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -2928,7 +2928,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Bittrex BARE Deposit Address:</string>
+      <string>Bittrex Bare Deposit Address:</string>
      </property>
     </widget>
     <widget class="QPushButton" name="GenDepositBTN">

@@ -1,5 +1,4 @@
 // Copyright (c) 2012-2014 The Bitcoin developers
-// Copyright (c) 2015-2017 The PIVX developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -254,7 +253,7 @@ double CCoinsViewCache::GetPriority(const CTransaction& tx, int nHeight) const
         assert(coins);
         if (!coins->IsAvailable(txin.prevout.n)) continue;
         if (coins->nHeight < nHeight) {
-            dResult += coins->vout[txin.prevout.n].nValue * (nHeight - coins->nHeight); // value * age
+            dResult += coins->vout[txin.prevout.n].nValue * (nHeight - coins->nHeight);
         }
     }
     return tx.ComputePriority(dResult);

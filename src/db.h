@@ -101,9 +101,8 @@ protected:
     std::string strFile;
     DbTxn* activeTxn;
     bool fReadOnly;
-    int nSerVersion;
 
-    explicit CDB(const std::string& strFilename, const char* pszMode = "r+", int nSerVersion = CLIENT_VERSION);
+    explicit CDB(const std::string& strFilename, const char* pszMode = "r+");
     ~CDB() { Close(); }
 
 public:
@@ -122,7 +121,7 @@ protected:
             return false;
 
         // Key
-        CDataStream ssKey(SER_DISK, nSerVersion);
+        CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         ssKey.reserve(1000);
         ssKey << key;
         Dbt datKey(&ssKey[0], ssKey.size());
@@ -137,7 +136,7 @@ protected:
 
         // Unserialize value
         try {
-            CDataStream ssValue((char*)datValue.get_data(), (char*)datValue.get_data() + datValue.get_size(), SER_DISK, nSerVersion);
+            CDataStream ssValue((char*)datValue.get_data(), (char*)datValue.get_data() + datValue.get_size(), SER_DISK, CLIENT_VERSION);
             ssValue >> value;
         } catch (const std::exception&) {
             return false;
@@ -158,13 +157,13 @@ protected:
             assert(!"Write called on database in read-only mode");
 
         // Key
-        CDataStream ssKey(SER_DISK, nSerVersion);
+        CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         ssKey.reserve(1000);
         ssKey << key;
         Dbt datKey(&ssKey[0], ssKey.size());
 
         // Value
-        CDataStream ssValue(SER_DISK, nSerVersion);
+        CDataStream ssValue(SER_DISK, CLIENT_VERSION);
         ssValue.reserve(10000);
         ssValue << value;
         Dbt datValue(&ssValue[0], ssValue.size());
@@ -187,7 +186,7 @@ protected:
             assert(!"Erase called on database in read-only mode");
 
         // Key
-        CDataStream ssKey(SER_DISK, nSerVersion);
+        CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         ssKey.reserve(1000);
         ssKey << key;
         Dbt datKey(&ssKey[0], ssKey.size());
@@ -207,7 +206,7 @@ protected:
             return false;
 
         // Key
-        CDataStream ssKey(SER_DISK, nSerVersion);
+        CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         ssKey.reserve(1000);
         ssKey << key;
         Dbt datKey(&ssKey[0], ssKey.size());

@@ -1,6 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2015-2017 The PIVX developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -274,8 +273,6 @@ inline void Serialize(Stream& s, bool a, int, int = 0)
     char f = a;
     WRITEDATA(s, f);
 }
-
-
 template <typename Stream>
 inline void Unserialize(Stream& s, bool& a, int, int = 0)
 {
@@ -283,6 +280,8 @@ inline void Unserialize(Stream& s, bool& a, int, int = 0)
     READDATA(s, f);
     a = f;
 }
+
+
 /**
  * Compact Size
  * size <  253        -- 1 byte
@@ -915,14 +914,6 @@ public:
         ::Serialize(*this, obj, nType, nVersion);
         return (*this);
     }
-
-    //
-    // Stream subset
-    //
-    void SetType(int n) { nType = n; }
-    int GetType() { return nType; }
-    void SetVersion(int n) { nVersion = n; }
-    int GetVersion() { return nVersion; }
 
     size_t size() const
     {

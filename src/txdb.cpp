@@ -1,7 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2012-2013 The PPCoin developers
-// Copyright (c) 2016-2018 The PIVX developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -9,7 +7,6 @@
 
 #include "main.h"
 #include "pow.h"
-#include "random.h"
 #include "uint256.h"
 
 #include <stdint.h>
@@ -76,10 +73,6 @@ bool CCoinsViewDB::BatchWrite(CCoinsMap& mapCoins, const uint256& hashBlock)
 
 CBlockTreeDB::CBlockTreeDB(size_t nCacheSize, bool fMemory, bool fWipe) : CLevelDBWrapper(GetDataDir() / "blocks" / "index", nCacheSize, fMemory, fWipe)
 {
-    if (!Read('S', salt)) {
-        salt = GetRandHash();
-        Write('S', salt);
-    }
 }
 
 bool CBlockTreeDB::WriteBlockIndex(const CDiskBlockIndex& blockindex)
@@ -188,55 +181,6 @@ bool CBlockTreeDB::WriteTxIndex(const std::vector<std::pair<uint256, CDiskTxPos>
     return WriteBatch(batch);
 }
 
-bool CBlockTreeDB::ReadAddrIndex(uint160 addrid, std::vector<CExtDiskTxPos> &list) {
-    boost::scoped_ptr<leveldb::Iterator> pcursor(NewIterator());
-
-    uint64_t lookupid;
-    {
-        CHashWriter ss(SER_GETHASH, 0);
-        ss << salt;
-        ss << addrid;
-        lookupid = (ss.GetHash()).GetLow64();
-    }
-
-    CDataStream firstKey(SER_DISK, CLIENT_VERSION);
-    firstKey << make_pair('a', lookupid);
-    pcursor->Seek(firstKey.str());
-
-    for(pcursor->Seek(firstKey.str()); pcursor->Valid(); pcursor->Next()) {
-        leveldb::Slice key = pcursor->key();
-        CDataStream ssKey(key.data(), key.data() + key.size(), SER_DISK, CLIENT_VERSION);
-        char id;
-        ssKey >> id;
-        if(id == 'a') {
-            uint64_t lid;
-            ssKey >> lid;
-            if(lid == lookupid) {
-                CExtDiskTxPos position;
-                ssKey >> position;
-                list.push_back(position);
-            } else {
-                break;
-            }
-        } else {
-            break;
-        }
-    }
-    return true;
-}
-
-bool CBlockTreeDB::AddAddrIndex(const std::vector<std::pair<uint160, CExtDiskTxPos> > &list) {
-    unsigned char foo[0];
-    CLevelDBBatch batch;
-    for (std::vector<std::pair<uint160, CExtDiskTxPos> >::const_iterator it=list.begin(); it!=list.end(); it++) {
-        CHashWriter ss(SER_GETHASH, 0);
-        ss << salt;
-        ss << it->first;
-        batch.Write(make_pair(make_pair('a', (ss.GetHash()).GetLow64()), it->second), FLATDATA(foo));
-    }
-    return WriteBatch(batch, true);
-}
-
 bool CBlockTreeDB::WriteFlag(const std::string& name, bool fValue)
 {
     return Write(std::make_pair('F', name), fValue ? '1' : '0');
@@ -251,16 +195,6 @@ bool CBlockTreeDB::ReadFlag(const std::string& name, bool& fValue)
     return true;
 }
 
-bool CBlockTreeDB::WriteInt(const std::string& name, int nValue)
-{
-    return Write(std::make_pair('I', name), nValue);
-}
-
-bool CBlockTreeDB::ReadInt(const std::string& name, int& nValue)
-{
-    return Read(std::make_pair('I', name), nValue);
-}
-
 bool CBlockTreeDB::LoadBlockIndexGuts()
 {
     boost::scoped_ptr<leveldb::Iterator> pcursor(NewIterator());
@@ -270,7 +204,6 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
     pcursor->Seek(ssKeySet.str());
 
     // Load mapBlockIndex
-    uint256 nPreviousCheckpoint;
     while (pcursor->Valid()) {
         boost::this_thread::interruption_point();
         try {
@@ -309,7 +242,7 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
                 pindexNew->nStakeTime = diskindex.nStakeTime;
                 pindexNew->hashProofOfStake = diskindex.hashProofOfStake;
 
-                if (pindexNew->nHeight <= Params().LAST_POW_BLOCK()) {
+                if (pindexNew->nHeight <= Params().LAST_POW_BLOCK() && !pindexNew->hashMerkleRoot.EqualTo(0)) {
                     if (!CheckProofOfWork(pindexNew->GetBlockHash(), pindexNew->nBits))
                         return error("LoadBlockIndex() : CheckProofOfWork failed: %s", pindexNew->ToString());
                 }

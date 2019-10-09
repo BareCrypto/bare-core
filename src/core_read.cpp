@@ -1,5 +1,4 @@
 // Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2015-2017 The PIVX developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -10,7 +9,7 @@
 #include "script/script.h"
 #include "serialize.h"
 #include "streams.h"
-#include <univalue.h>
+#include "univalue/univalue.h"
 #include "util.h"
 #include "utilstrencodings.h"
 #include "version.h"
@@ -79,26 +78,12 @@ CScript ParseScript(std::string s)
     return result;
 }
 
-bool DecodeHexTx(CTransaction& tx, const std::string& strHexTx, bool fTryNoWitness)
+bool DecodeHexTx(CTransaction& tx, const std::string& strHexTx)
 {
     if (!IsHex(strHexTx))
         return false;
 
     vector<unsigned char> txData(ParseHex(strHexTx));
-
-    if (fTryNoWitness) {
-        CDataStream ssData(txData, SER_NETWORK, PROTOCOL_VERSION | SERIALIZE_TRANSACTION_NO_WITNESS);
-        try {
-            ssData >> tx;
-            if (ssData.eof()) {
-                return true;
-            }
-        }
-        catch (const std::exception&) {
-            // Fall through.
-        }
-    }
-
     CDataStream ssData(txData, SER_NETWORK, PROTOCOL_VERSION);
     try {
         ssData >> tx;

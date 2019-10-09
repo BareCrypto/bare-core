@@ -1,5 +1,5 @@
 Sample init scripts and service configuration for bared
-==========================================================
+=======================================================
 
 Sample scripts and configuration files for systemd, Upstart and OpenRC
 can be found in the contrib/init folder.
@@ -11,13 +11,13 @@ can be found in the contrib/init folder.
     contrib/init/bared.init:       CentOS compatible SysV style init script
 
 1. Service User
----------------------------------
+---------------
 
 All three startup configurations assume the existence of a "bare" user
 and group.  They must be created before attempting to use these scripts.
 
 2. Configuration
----------------------------------
+----------------
 
 At a bare minimum, bared requires that the rpcpassword setting be set
 when running as a daemon.  If the configuration file does not exist or this
@@ -41,7 +41,7 @@ For an example configuration file that describes the configuration settings,
 see contrib/debian/examples/bare.conf.
 
 3. Paths
----------------------------------
+--------
 
 All three configurations assume several paths that might need to be adjusted.
 
@@ -89,11 +89,11 @@ use old versions of Upstart and do not supply the start-stop-daemon uitility.
 Copy bared.init to /etc/init.d/bared. Test by running "service bared start".
 
 Using this script, you can adjust the path and flags to the bared program by
-setting the BareD and FLAGS environment variables in the file
+setting the WBRD and FLAGS environment variables in the file
 /etc/sysconfig/bared. You can also use the DAEMONOPTS environment variable here.
 
 5. Auto-respawn
------------------------------------
+---------------
 
 Auto respawning is currently only configured for Upstart and systemd.
 Reasonable defaults have been chosen but YMMV.

@@ -38,7 +38,6 @@
 #include <net/if.h>
 #include <netdb.h>
 #include <netinet/in.h>
-#include <netinet/tcp.h>
 #include <sys/fcntl.h>
 #include <sys/mman.h>
 #include <sys/socket.h>
@@ -89,9 +88,7 @@ typedef u_int SOCKET;
 #define THREAD_PRIORITY_ABOVE_NORMAL (-2)
 #endif
 
-#if HAVE_DECL_STRNLEN == 0
-size_t strnlen( const char *start, size_t max_len);
-#endif // HAVE_DECL_STRNLEN
+size_t strnlen_int(const char* start, size_t max_len);
 
 bool static inline IsSelectableSocket(SOCKET s)
 {
