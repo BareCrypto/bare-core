@@ -176,8 +176,8 @@ public:
             LogPrintf(" time: %u\n", genesis.nTime);
             LogPrintf(" hash: 0x%s\n", genesis.GetHash().ToString().c_str());
             LogPrintf(" merklehash: 0x%s\n", genesis.hashMerkleRoot.ToString().c_str());
-            assert(hashGenesisBlock == uint256("0x000000731191b78b71c7352a3f877e9429d5b26b67c41020e21dffb14f783b50"));
-            assert(genesis.hashMerkleRoot == uint256("0x023b3b4bd3fb83cd05066b9d8104ebc5ba76f81ee9743533490e9dffa36a4379"));
+            assert(hashGenesisBlock == uint256("000000731191b78b71c7352a3f877e9429d5b26b67c41020e21dffb14f783b50"));
+            assert(genesis.hashMerkleRoot == uint256("023b3b4bd3fb83cd05066b9d8104ebc5ba76f81ee9743533490e9dffa36a4379"));
         }
         // Mainnet --- nonce: 1 time: 1536266133 hash: 0x0b58ed450b3819ca54ab0054c4d220ca4f887d21c9e55d2a333173adf76d987f merklehash: 0x72aeadf2484a1961e260a25d5d03ced4452e834eeed6bdc4457252f6c444914e
 
