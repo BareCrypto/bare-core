@@ -582,7 +582,7 @@ void BitcoinGUI::createMenuBar()
 	bare->addAction(showExplorerAction);
 	bare->addSeparator();
 	bare->addAction(showCrexAction);
-	bare->addAction(showCoingeckoAction);	
+	bare->addAction(showCoingeckoAction);
 }
 
 void BitcoinGUI::createToolBars()

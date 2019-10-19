@@ -61,6 +61,8 @@
         <file alias="tx_output">res/icons/tx_output.png</file>
         <file alias="unlock_tab">res/icons/unlock_tab.png</file>
         <file alias="verify_menu">res/icons/verify_menu.png</file>
+		<file alias="crex">res/icons/crex.png</file>
+        <file alias="gecko">res/icons/gecko.png</file>
     </qresource>
     <qresource prefix="/css">
         <file alias="default">res/css/default.css</file>
