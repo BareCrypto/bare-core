@@ -498,7 +498,7 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
     connect(showHelpMessageAction, SIGNAL(triggered()), this, SLOT(showHelpMessageClicked()));
 	
     connect(showWebsiteAction, SIGNAL(triggered()), this, SLOT(WebsiteClicked()));
-    connect(showExplorerAction, SIGNAL(triggered()), this, SLOT(ExlorerClicked()));
+    connect(showExplorerAction, SIGNAL(triggered()), this, SLOT(ExplorerClicked()));
     connect(showCrexAction, SIGNAL(triggered()), this, SLOT(CrexClicked()));
     connect(showCoingeckoAction, SIGNAL(triggered()), this, SLOT(CoingeckoClicked()));	
 	
