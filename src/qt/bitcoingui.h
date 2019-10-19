@@ -127,6 +127,10 @@ private:
     QAction* openAction;
     QAction* openBlockExplorerAction;
     QAction* showHelpMessageAction;
+	QAction* showWebsiteAction;
+	QAction* showExplorerAction;
+	QAction* showCrexAction;
+	QAction* showCoingeckoAction;
     QAction* multiSendAction;
 
     QSystemTrayIcon* trayIcon;
