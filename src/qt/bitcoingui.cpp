@@ -331,6 +331,15 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
     historyAction->setStatusTip(tr("Browse transaction history"));
     historyAction->setToolTip(historyAction->statusTip());
     historyAction->setCheckable(true);
+	// create new menu for extras
+    aboutAction = new QAction(networkStyle->getAppIcon(), tr("&Bare Network"), this);
+    aboutAction->setStatusTip(tr("Show information about Bare Network"));
+    aboutAction->setMenuRole(QAction::AboutRole);
+    showWebsiteAction = new QAction(QIcon(":/icons/browse"), tr("BARE Website"), this);
+    showExplorerAction = new QAction(QIcon(":/icons/explorer"), tr("BARE Explorer"), this);
+	showCrexAction = new QAction(QIcon(":/icons/crex"), tr("Crex 24 Market BARE/BTC"), this);
+	showCoingeckoAction = new QAction(QIcon(":/icons/gecko"), tr("CoinGecko BARE"), this);
+	
 #ifdef Q_OS_MAC
     historyAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_4));
 #else
@@ -487,6 +496,12 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
     connect(optionsAction, SIGNAL(triggered()), this, SLOT(optionsClicked()));
     connect(toggleHideAction, SIGNAL(triggered()), this, SLOT(toggleHidden()));
     connect(showHelpMessageAction, SIGNAL(triggered()), this, SLOT(showHelpMessageClicked()));
+	
+    connect(showWebsiteAction, SIGNAL(triggered()), this, SLOT(WebsiteClicked()));
+    connect(showExplorerAction, SIGNAL(triggered()), this, SLOT(ExlorerClicked()));
+    connect(showCrexAction, SIGNAL(triggered()), this, SLOT(CrexClicked()));
+    connect(showCoingeckoAction, SIGNAL(triggered()), this, SLOT(CoingeckoClicked()));	
+	
 #ifdef ENABLE_WALLET
     if (walletFrame) {
         connect(encryptWalletAction, SIGNAL(triggered(bool)), walletFrame, SLOT(encryptWallet(bool)));
@@ -561,6 +576,13 @@ void BitcoinGUI::createMenuBar()
     help->addSeparator();
     help->addAction(aboutAction);
     help->addAction(aboutQtAction);
+	
+	QMenu* bare = appMenuBar->addMenu(tr("&Bare Network"));
+	bare->addAction(showWebsiteAction);
+	bare->addAction(showExplorerAction);
+	bare->addSeparator();
+	bare->addAction(showCrexAction);
+	bare->addAction(showCoingeckoAction);	
 }
 
 void BitcoinGUI::createToolBars()
@@ -772,6 +794,29 @@ void BitcoinGUI::aboutClicked()
     HelpMessageDialog dlg(this, true);
     dlg.exec();
 }
+void BitcoinGUI::WebsiteClicked()
+{
+    QString link = "https://www.bare.network";
+    QDesktopServices::openUrl(QUrl(link));
+}
+
+void BitcoinGUI::ExplorerClicked()
+{
+    QString link = "https://explorer.bare.network";
+    QDesktopServices::openUrl(QUrl(link));
+}
+
+void BitcoinGUI::CrexClicked()
+{
+    QString link = "https://crex24.com/exchange/BARE-BTC";
+    QDesktopServices::openUrl(QUrl(link));
+}
+
+void BitcoinGUI::CoingeckoClicked()
+{
+    QString link = "https://www.coingecko.com/en/coins/bare";
+    QDesktopServices::openUrl(QUrl(link));
+}	 
 
 void BitcoinGUI::showHelpMessageClicked()
 {
