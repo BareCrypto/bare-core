@@ -37,7 +37,7 @@
 #include "util.h"
 
 #include <iostream>
-
+#include <QDesktopServices>
 #include <QAction>
 #include <QApplication>
 #include <QDateTime>
