@@ -48,7 +48,17 @@ static void convertSeed6(std::vector<CAddress>& vSeedsOut, const SeedSpec6* data
 
 
 static Checkpoints::MapCheckpoints mapCheckpoints =
-    boost::assign::map_list_of(0, uint256("0x000000731191b78b71c7352a3f877e9429d5b26b67c41020e21dffb14f783b50"));
+    boost::assign::map_list_of
+	(	  0, uint256("0x000000731191b78b71c7352a3f877e9429d5b26b67c41020e21dffb14f783b50"))
+	(   515, uint256("0x899bc6a7c9c674adaca31defd5c58993564bd7ca4aae61438c4afa782afdd38b"))
+	( 23993, uint256("0xe82e40035a0a71d3065929f47dcc90c16bf9af9e2b731b4ef1eb37ee4437c3a5"))
+	( 50005, uint256("0x4ca265ce1bceeae7a08606db0fdb83b0cb0ef603a25f64a1b8754dc488f18207"))
+    ( 97996, uint256("0xc851870c5f3139f4700b6a1ab22051580ecb9b7f7727829d7209bffb54001ee5"))
+    (104792, uint256("0xd712a06d3f0272dc0dc39e46df4b9755b6c97a41ce92b1901b2417e08774571f"))
+    (126806, uint256("0x2d3e4fe9ceab771ed49a708bb209f1695de10a5af10b652adb2e991fe52e2543"))
+    (160175, uint256("0x6559c13bc449f1a68302a77945936ca3842c0bcbb9573a9e37cff687359fcb93"))
+	(195223, uint256("0x5908dabd6a14e04cf0bdaedaed9e3cec5bed6ffd71f327c52c03776d81c078d7"));
+	
 static const Checkpoints::CCheckpointData data = {
     &mapCheckpoints,
 	1559634300, // * UNIX timestamp of last checkpoint block
@@ -135,9 +145,9 @@ public:
         assert(genesis.hashMerkleRoot == uint256("0x023b3b4bd3fb83cd05066b9d8104ebc5ba76f81ee9743533490e9dffa36a4379"));
 
         vSeeds.push_back(CDNSSeedData("dns1", "dns1.bare.network"));
-	vSeeds.push_back(CDNSSeedData("dns2", "dns2.bare.network"));
-	vSeeds.push_back(CDNSSeedData("dns3", "dns3.bare.network"));
-	vSeeds.push_back(CDNSSeedData("dns4", "dns4.bare.network"));
+		vSeeds.push_back(CDNSSeedData("dns2", "dns2.bare.network"));
+		vSeeds.push_back(CDNSSeedData("dns3", "dns3.bare.network"));
+		vSeeds.push_back(CDNSSeedData("dns4", "dns4.bare.network"));
 																	 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 25); //Bare adresses start with "B"
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 16);
